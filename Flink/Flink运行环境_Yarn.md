@@ -81,7 +81,7 @@ bin/flink run \
 
 ###### 2. Per-Job-Cluster
 
-一个Job会对应一个Flink集群，每提交一个作业会根据自身的情况，都会单独向yarn申请资源，直到作业执行完成，一个作业的失败并不会影响下一个作业的正常提交和执行。独享Dispatcher和ResourceManager，按需接受资源申请，适合大规模长时间运行的作业。
+一个Job会对应一个Flink集群，每提交一个作业会根据自身的情况，都会单独向yarn申请资源，直到作业执行完成，一个作业的失败并不会影响下一个作业的正常提交和执行。独享Dispatcher和ResourceManager，按需接受资源申请，适合大规模长时间运行的作业。对于资源方面，任务独占集群，隔离性最好。
 
 每次提交作业都会创建一个新的Flink集群，任务之间互相独立，互不影响，方便管理。在任务执行完成之后创建的集群也会消失。
 
@@ -103,7 +103,7 @@ bin/flink run \
 
 ###### 3. Application Mode
 
-Application Mode会在Yarn上启动集群，应用jar包的main函数将会在JobManager上执行，只要应用程序执行结束，Flink集群会马上被关闭，也可以手动停止集群。
+Application Mode会在Yarn上启动集群，应用jar包的main函数将会在JobManager上执行，只要应用程序Application执行结束，Flink集群会马上被关闭，也可以手动停止集群。资源的隔离性对于集群来说，Application之间隔离，Application内共享。
 
 ```
 bin/flink run-application \
@@ -116,7 +116,7 @@ bin/flink run-application \
 ###### 4. Per-Job-Cluster和Application Mode的区别
 
 ```
-Per-Job-Cluster模式的main方法在客户端执行，Application Mode中的main方法在JobManager中执行，也就是说Application Mode模式将main方法提交到了集群执行。通过在JobManager中执行程序的main方法，Application模式可以节省很多提交应用所需的资源。
+Per-Job-Cluster模式的main方法在客户端执行，Application Mode中的main方法在JobManager中执行，也就是说Application Mode模式将main方法提交到了集群执行。通过在JobManager中执行程序的main方法，Application模式可以节省很多提交应用所需的资源。同时就对于资源的隔离性来说，Per-Job-Cluster对资源的隔离性最好，Appcalition次之。
 ```
 
 ##### 8. Yarn模式高可用
