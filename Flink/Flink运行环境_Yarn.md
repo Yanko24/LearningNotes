@@ -115,9 +115,7 @@ bin/flink run-application \
 
 ###### 4. Per-Job-Cluster和Application Mode的区别
 
-```
 Per-Job-Cluster模式的main方法在客户端执行，Application Mode中的main方法在JobManager中执行，也就是说Application Mode模式将main方法提交到了集群执行。通过在JobManager中执行程序的main方法，Application模式可以节省很多提交应用所需的资源。同时就对于资源的隔离性来说，Per-Job-Cluster对资源的隔离性最好，Appcalition次之。
-```
 
 ##### 8. Yarn模式高可用
 
