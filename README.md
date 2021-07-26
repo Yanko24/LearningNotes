@@ -1,10 +1,10 @@
 <table>
     <tr>
-      <th><img width="50px" src="/images/集群搭建.png"></th>
-      <th><img width="50px" src="/images/hadoop.jpg"></th>
-      <th><img width="50px" src="/images/hive.jpg"></th>
-      <th><img width="50px" src="/images/spark.jpg"></th>
-      <th><img width="50px" src="/images/flink.png"></th>
+      <th><a href="#一集群搭建"><img width="50px" src="images/集群搭建.png"></th></a>
+      <th><a href="#二Hadoop"><img width="50px" src="images/hadoop.jpg"></th></a>
+      <th><a href="#三Hive"><img width="50px" src="images/hive.jpg"></th></a>
+      <th><a href="#四Spark"><img width="50px" src="images/spark.jpg"></th></a>
+      <th><a href="#五Flink"><img width="50px" src="images/flink.png"></th></a>
     </tr>
     <tr>
       <td align="center"><a href="#一集群搭建">集群搭建</a></td>
@@ -14,6 +14,7 @@
       <td align="center"><a href="#五Flink">Flink</a></td>
     </tr>
   </table>
+
 
 
 
