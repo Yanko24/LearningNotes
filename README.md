@@ -1,10 +1,10 @@
 <table>
     <tr>
-      <th><img width="50px" src="http://typora-image.test.upcdn.net/images/%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA.png"></th>
+      <th><img width="50px" src="/images/集群搭建.png"></th>
       <th><img width="50px" src="/images/hadoop.jpg"></th>
-      <th><img width="50px" src="http://typora-image.test.upcdn.net/images/hive.jpg"></th>
-      <th><img width="50px" src="http://typora-image.test.upcdn.net/images/spark.jpg"></th>
-      <th><img width="50px" src="http://typora-image.test.upcdn.net/images/flink.png"></th>
+      <th><img width="50px" src="/images/hive.jpg"></th>
+      <th><img width="50px" src="/images/spark.jpg"></th>
+      <th><img width="50px" src="/images/flink.png"></th>
     </tr>
     <tr>
       <td align="center"><a href="#一集群搭建">集群搭建</a></td>
