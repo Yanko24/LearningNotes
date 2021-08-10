@@ -1,6 +1,6 @@
 <table>
     <tr>
-      <th><a href="#一集群搭建"><img width="50px" src="images/集群搭建.png"></th></a>
+      <th><a href="#一大数据集群搭建"><img width="50px" src="images/集群搭建.png"></th></a>
       <th><a href="#二Hadoop"><img width="50px" src="images/hadoop.jpg"></th></a>
       <th><a href="#三Hive"><img width="50px" src="images/hive.jpg"></th></a>
       <th><a href="#四Spark"><img width="50px" src="images/spark.jpg"></th></a>
@@ -18,16 +18,13 @@
 
 
 
-
-
-
-# BigData-Home
+# LearningNotes
 
 从零开始记录自己学习大数据的过程以及自己遇见的一些错误的解决办法。
 
 
 
-## 一、集群搭建
+## 一、大数据集群搭建
 
 1.[Hadoop集群搭建之CentOS7系统配置](集群搭建/Hadoop集群搭建之CentOS7系统配置.md)
 
