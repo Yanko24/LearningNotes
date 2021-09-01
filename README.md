@@ -1,19 +1,20 @@
 <table>
-    <tr>
-      <th><a href="#一大数据集群搭建"><img width="50px" src="images/大数据集群搭建.png"></th></a>
+    <tr align="center">
+      <th><a href="#一大数据集群搭建"><img width="50px" src="images/大数据集群搭建.png" text-align="center" vertical-align="middle"></th></a>
       <th><a href="#二Hadoop"><img width="50px" src="images/hadoop.jpg"></th></a>
       <th><a href="#三Hive"><img width="50px" src="images/hive.jpg"></th></a>
       <th><a href="#四Spark"><img width="50px" src="images/spark.jpg"></th></a>
       <th><a href="#五Flink"><img width="50px" src="images/flink.png"></th></a>
     </tr>
-    <tr>
+    <tr align="center">
       <td align="center"><a href="#一大数据集群搭建">大数据集群搭建</a></td>
       <td align="center"><a href="#二Hadoop">Hadoop</a></td>
       <td align="center"><a href="#三Hive">Hive</a></td>
       <td align="center"><a href="#四Spark">Spark</a></td>
       <td align="center"><a href="#五Flink">Flink</a></td>
     </tr>
-  </table>
+</table>
+
 
 
 
