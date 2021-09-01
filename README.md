@@ -14,7 +14,7 @@
       <th><a href="#四Spark"><img width="50px" src="images/spark.jpg"></th></a>
       <th><a href="#五Flink"><img width="50px" src="images/flink.png"></th></a>
       <th><a href="#六HBase"><img width="50px" src="images/hbase.png"></a></th>
-      <th><a href="#七HBase"><img width="50px" src="images/kafka.png"></a></th>
+      <th><a href="#七Kafka"><img width="50px" src="images/kafka.png"></a></th>
     </tr>
     <tr align="center">
       <td><a href="#一大数据集群搭建">大数据集群搭建</a></td>
@@ -23,7 +23,7 @@
       <td><a href="#四Spark">Spark</a></td>
       <td><a href="#五Flink">Flink</a></td>
       <td><a href="#六HBase">HBase</a></td>
-      <td><a href="#七HBase">Kafka</a></td>
+      <td><a href="#七Kafka">Kafka</a></td>
     </tr>
 </table>
 
@@ -49,6 +49,7 @@
       <td><a href="#六Kafka面试题">Kafka面试题</a></td>
     </tr>
 </table>
+
 
 <br>
 
