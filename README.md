@@ -1,6 +1,6 @@
 # LearningNotes
 
-从零开始记录自己学习大数据的过程以及自己遇见的一些错误的解决办法。
+学习记录
 
 
 
@@ -16,12 +16,12 @@
       <th><a href="#六HBase"><img width="50px" src="images/hbase.png"></a></th>
     </tr>
     <tr align="center">
-      <td align="center"><a href="#一大数据集群搭建">大数据集群搭建</a></td>
-      <td align="center"><a href="#二Hadoop">Hadoop</a></td>
-      <td align="center"><a href="#三Hive">Hive</a></td>
-      <td align="center"><a href="#四Spark">Spark</a></td>
-      <td align="center"><a href="#五Flink">Flink</a></td>
-      <td align="center"><a href="#六HBase">HBase</a></td>
+      <td><a href="#一大数据集群搭建">大数据集群搭建</a></td>
+      <td><a href="#二Hadoop">Hadoop</a></td>
+      <td><a href="#三Hive">Hive</a></td>
+      <td><a href="#四Spark">Spark</a></td>
+      <td><a href="#五Flink">Flink</a></td>
+      <td><a href="#六HBase">HBase</a></td>
     </tr>
 </table>
 
