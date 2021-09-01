@@ -13,6 +13,7 @@
       <th><a href="#三Hive"><img width="50px" src="images/hive.jpg"></th></a>
       <th><a href="#四Spark"><img width="50px" src="images/spark.jpg"></th></a>
       <th><a href="#五Flink"><img width="50px" src="images/flink.png"></th></a>
+      <th><a href="#六HBase"><img width="50px" src="images/hbase.png"></a></th>
     </tr>
     <tr align="center">
       <td align="center"><a href="#一大数据集群搭建">大数据集群搭建</a></td>
@@ -20,8 +21,10 @@
       <td align="center"><a href="#三Hive">Hive</a></td>
       <td align="center"><a href="#四Spark">Spark</a></td>
       <td align="center"><a href="#五Flink">Flink</a></td>
+      <td align="center"><a href="六HBase">HBase</a></td>
     </tr>
 </table>
+
 <br>
 
 ### 大数据面试
@@ -32,15 +35,16 @@
       <th><a href="#二Hive面试题"><img width="50px" src="images/hive.jpg"></th></a>
       <th><a href="#三Spark面试题"><img width="50px" src="images/spark.jpg"></th></a>
       <th><a href="#四Flink面试题"><img width="50px" src="images/flink.png"></th></a>
+      <th><a href="#五HBase面试题"><img witdh="50px" src="images/hbase.png"></a></th>
     </tr>
     <tr align="center">
       <td align="center"><a href="#一Hadoop面试题">Hadoop面试题</a></td>
       <td align="center"><a href="#二Hive面试题">Hive面试题</a></td>
       <td align="center"><a href="#三Spark面试题">Spark面试题</a></td>
       <td align="center"><a href="#四Flink面试题">Flink面试题</a></td>
+      <td align="center"><a href="#五HBase面试题">HBase面试题</a></td>
     </tr>
 </table>
-
 <br>
 
 ### 第一部分：大数据框架
@@ -117,6 +121,10 @@
 
 6.[Flink中如何判断需要几个slot以及任务链的划分](Flink/Flink中如何判断需要几个slot以及任务链的划分.md)
 
+#### 六、HBase
+
+1.[DBeaver连接Phoenix](HBase/DBeaver连接Phoenix.md)
+
 <br>
 
 ### 第二部分：大数据面试
@@ -138,4 +146,8 @@
 #### 四、Flink面试题
 
 1.[Flink常见的面试题](Flink/Flink常见的面试题.md)
+
+#### 五、HBase面试题
+
+1.[HBase常见的面试题](HBase/HBase常见的面试题.md)
 
