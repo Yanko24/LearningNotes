@@ -1,19 +1,15 @@
-# Hadoop
-
-从零开始记录自己学习Hadoop的过程以及自己遇见的一些错误的解决办法。
-
-### Hadoop集群搭建
+### Hadoop
 
 ---
 
-[1.Hadoop集群搭建之CentOS7系统配置](1.Hadoop集群搭建之CentOS7系统配置.md)
+从零开始记录自己学习Hadoop的过程以及自己遇见的一些错误的解决办法。
 
-[2.Hadoop集群搭建之全分布式集群搭建](2.Hadoop集群搭建之全分布式集群搭建.md)
+<br>
 
-[3.Hadoop集群搭建之Hive安装](3.Hadoop集群搭建之Hive安装.md)
+#### 一、Hadoop框架学习
 
-[4.Hadoop集群搭建之HBase安装](4.Hadoop集群搭建之HBase安装.md)
+<br>
 
-[5.Hadoop集群搭建之Zeepline安装](5.Hadoop集群搭建之Zeepline安装.md)
+#### 二、Hadoop面试题
 
-[6.Hadoop-HA集群启动脚本](6.Hadoop-HA集群启动脚本.md)
+1.[Hadoop常见的面试题](Hadoop常见的面试题.md)
