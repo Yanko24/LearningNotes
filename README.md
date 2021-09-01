@@ -129,7 +129,11 @@
 
 #### 二、Hive面试题
 
+1.[Hive常见的面试题](Hive/Hive常见的面试题.md)
+
 #### 三、Spark面试题
+
+1.[Spark常见的面试题](Spark/Spark常见的面试题.md)
 
 #### 四、Flink面试题
 
