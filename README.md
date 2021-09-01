@@ -14,6 +14,7 @@
       <th><a href="#四Spark"><img width="50px" src="images/spark.jpg"></th></a>
       <th><a href="#五Flink"><img width="50px" src="images/flink.png"></th></a>
       <th><a href="#六HBase"><img width="50px" src="images/hbase.png"></a></th>
+      <th><a href="#七HBase"><img width="50px" src="images/kafka.png"></a></th>
     </tr>
     <tr align="center">
       <td><a href="#一大数据集群搭建">大数据集群搭建</a></td>
@@ -22,6 +23,7 @@
       <td><a href="#四Spark">Spark</a></td>
       <td><a href="#五Flink">Flink</a></td>
       <td><a href="#六HBase">HBase</a></td>
+      <td><a href="#七HBase">Kafka</a></td>
     </tr>
 </table>
 
@@ -36,6 +38,7 @@
       <th><a href="#三Spark面试题"><img width="50px" src="images/spark.jpg"></th></a>
       <th><a href="#四Flink面试题"><img width="50px" src="images/flink.png"></th></a>
       <th><a href="#五HBase面试题"><img width="50px" src="images/hbase.png"></a></th>
+      <th><a href="#六Kafka面试题"><img width="50px" src="images/kafka.png"></a></th>
     </tr>
     <tr align="center">
       <td><a href="#一Hadoop面试题">Hadoop面试题</a></td>
@@ -43,6 +46,7 @@
       <td><a href="#三Spark面试题">Spark面试题</a></td>
       <td><a href="#四Flink面试题">Flink面试题</a></td>
       <td><a href="#五HBase面试题">HBase面试题</a></td>
+      <td><a href="#六Kafka面试题">Kafka面试题</a></td>
     </tr>
 </table>
 
@@ -126,6 +130,8 @@
 
 1.[DBeaver连接Phoenix](HBase/DBeaver连接Phoenix.md)
 
+#### 七、Kafka
+
 <br>
 
 ### 第二部分：大数据面试
@@ -152,3 +158,6 @@
 
 1.[HBase常见的面试题](HBase/HBase常见的面试题.md)
 
+#### 六、Kafka面试题
+
+1.[Kafka常见的面试题](Kafka/Kafka常见的面试题.md)
