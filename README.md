@@ -35,7 +35,7 @@
       <th><a href="#二Hive面试题"><img width="50px" src="images/hive.jpg"></th></a>
       <th><a href="#三Spark面试题"><img width="50px" src="images/spark.jpg"></th></a>
       <th><a href="#四Flink面试题"><img width="50px" src="images/flink.png"></th></a>
-      <th><a href="#五HBase面试题"><img witdh="50px" src="images/hbase.png"></a></th>
+      <th><a href="#五HBase面试题"><img width="50px" src="images/hbase.png"></a></th>
     </tr>
     <tr align="center">
       <td align="center"><a href="#一Hadoop面试题">Hadoop面试题</a></td>
