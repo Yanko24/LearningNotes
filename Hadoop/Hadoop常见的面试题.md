@@ -2,11 +2,9 @@
 
 ##### 1. 请说下HDFS的读写流程？
 
-###### HDFS读流程
+**HDFS读流程：**
 
-
-
-###### HDFS写流程
+**HDFS写流程：**
 
 ##### 2. HDFS在读取文件的时候，如果其中一个块突然损坏了怎么办？
 
@@ -39,23 +37,90 @@ NameNode数据存储在内存和本地磁盘，本地磁盘数据存储在fsimag
 
 ##### 5. Secondary NameNode了解吗？它的工作机制是怎样的？
 
+Secondary NameNode是合并NameNode和edit logs到fsimage文件中，它的具体工作机制：
+
+- Secondary NameNode询问NameNode是否需要checkpoint。直接带回NameNode是否检查结果
+- Secondary NameNode请求执行checkpoint
+- NameNode滚动正在写的edits日志
+- 将滚动前的编辑日志和镜像文件拷贝到Secondary NameNode
+- Secondary NameNode加载编辑日志和镜像文件到内存，并合并
+- 生成新的镜像文件fsimage.chkpoint
+- 拷贝fsimage.chkpoint到NameNode
+- NameNode将fsimage.chkpoint重命名成fsimage
+
+所以如果NameNode中的元数据丢失，是可以从Secondary NameNode恢复一部分元数据信息的，但不是全部，因为NameNode正在写的edits日志还没有拷贝到Secondary NameNode，这部分恢复不了。
+
 ##### 6. Secondary NameNode不能恢复NameNode的全部数据，那如何保证NameNode数据存储安全？
 
-##### 7. 在NameNode HA中，为什么会出现脑裂问题？怎么解决脑裂？
+这个问题就要说到NameNode的高可用了，即NameNode HA，一个NameNode有单点故障的问题，那就配置双NameNode，配置有两个关键点，一是必须要保证这两个NN的元数据信息必须要同步的，二是一个NN挂掉之后另一个要立马补上。
 
-##### 8. 小文件过多会有什么危害，如何避免？
+- 元数据信息同步在HA方案中采用的是“共享存储”。每次写文件时，需要将日志同步写入共享存储，这个步骤成功才能认定写文件成功。然后备份节点周期从共享存储同步日志，以便进行主备切换。
+- 监控NN状态采用zookeeper，两个NN节点的状态存放在ZK中，另外两个NN节点分别有一个进程监控程序，实时读取ZK中的NN状态，来判断当前的NN是不是已经宕机。如果standby的NN节点的ZKFC发现主节点已经挂掉，那么就会强制给原本的active NN节点发送强制关闭请求，之后将备用的NN设置为active。
+
+##### 7. 在NameNode HA中，共享存储是怎么实现的知道吗？
+
+NameNode共享存储方案有很多，比如Linux HA，VMware FT，QJM等，目前社区已经把由Clouderea公司实现的基于QJM（Quorum Journal Manager）的方案合并到HDFS的trunk之中并且作为默认的共享存储实现。
+
+基于QJM的共享存储系统主要用于保存EditLog，并不保存FSImage文件。FSImage文件还是在NameNode的本地磁盘上。QJM共享存储的基本思想是来自于Paxos算法，采用多个称为JournalNode的节点组成的JournalNode集群来存储EditLog。每个JorunalNode保存同样的EditLog副本。每次NameNode写EditLog的时候，除了向本地磁盘写入EditLog之外，也会并行地向JournalNode集群之中的每一个JournalNode发送写请求，只要大多数（majority）的JournalNode节点返回成功就认为向JournalNode集群写入EditLog成功。如果有2N+1台JournalNode，那么根据大数据的原则，最多可以容忍N台JournalNode节点挂掉。
+
+##### 8. 在NameNode HA中，为什么会出现脑裂问题？怎么解决脑裂？
+
+假设NameNode1当前为Active状态，NameNode2当前为standby状态。如果某一时刻NameNode1对应的ZFFailoverController进程发生了“假死”现象，那么Zookeeper服务端会认为NameNode1挂掉了，根据前面的主备切换逻辑，NameNode2会替代NameNode1进入Active状态。但是此时NameNode1可能扔处于Active状态正常运行，这样NameNode1和NameNode2都处于Active状态，都可以对外提供服务。这种情况称为脑裂。
+
+脑裂对于NameNode这类对数据一致性要求非常高的系统来说是灾难性的，数据会发生错乱且无法恢复。Zookeeper社区对这种问题的解决方法叫做fencing，中文翻译为隔离，也就是想办法把旧的Active NameNode隔离起来，使它不能正常对外提供服务。
+
+在进行fencing的时候，会执行以下的操作：
+
+- 首先尝试调用这个旧的Active NameNode的HAServiceProtocol RPC接口的transitionToStandby方法，看能不能把它转换为Standby状态。
+- 如果transitionToStandby方法调用失败，那么就执行Hadoop配置文件之中预定义的隔离措施，Hadoop目前主要提供两种隔离措施，通常会选择sshfence。
+  - sshfence：通过SSH登录到目标机器上，执行命令fuser将对应的进程杀死
+  - shellfence：执行一个用户自定义的shell脚本来将对应的进程隔离
+
+##### 9. 小文件过多会有什么危害，如何避免？
 
 Hadoop上大量HDFS元数据信息存储在NameNode内存中，因此过多的小文件必定会压垮NameNode的内存。每个元数据对象约占150byte，所以如果有1千万个小文件，每个文件占用一个block，则NameNode大约需要2G空间。如果存储1亿个文件，则NameNode需要20G空间。
 
 显而易见的解决这个问题的方法就是合并小文件，可以选择在客户端上传时执行一定的策略先合并，或者是使用Hadoop的CombineFileInputFormat<K,V>实现小文件的合并。
 
-##### 9. 请说下HDFS的组织架构？
+##### 10. 请说下HDFS的组织架构？
 
-##### 10. 请说下MR中的Map Task的工作机制？
+- Client：客户端
+  - 切分文件。文件上传HDFS的时候，Client将文件切分成一个一个的Block，然后进行存储
+  - 与NameNode交互，获取文件的位置信息
+  - 与DataNode交互，读取或者写入数据
+  - Client提供一些命令来管理HDFS，比如启动关闭HDFS、访问HDFS目录及内容等想·
+- NameNode：名称节点，也称主节点，存储数据的元数据信息，不存储具体的数据
+  - 管理HDFS的名称空间
+  - 管理数据块（Block）映射信息
+  - 配置副本策略
+  - 处理客户端读/写请求
+- DataNode：数据节点，也称从节点。NameNode下达命令，DataNode执行实际的操作
+  - 存储实际的数据块
+  - 执行数据块的读/写操作
+- Secondary NameNode：并非NameNode的热备。当NameNode挂掉的时候，它并不能马上替换NameNode并提供服务
+  - 辅助NameNode，分担其工作量
+  - 定期合并FSImage和Edits，并推送给NameNode
+  - 在紧急情况下，可辅助恢复NameNode
 
-##### 11. 请说下MR中的Reduce Task的工作机制？
+##### 11. 请说下MR中的Map Task的工作机制？
 
-##### 12. 请说下MR中shuffle阶段？
+**简单概述：**inputFile通过split被切割为多个split文件，通过Record按行读取内容给map（自己写的处理逻辑的方法），数据被map处理完之后交给OutputCollect收集器，对其结果key进行分区（默认使用的hashPartitioner），然后写入buffer，每个map task都有一个内存缓冲区（环形缓冲区），存放着map的输出结果，当缓冲区快满的时候需要将缓冲区的数据以一个临时文件的方式溢写到磁盘，当整个map task结束后再对磁盘中的整个maptask产生的所有临时文件合并，生成最终的正式输出文件，然后等待reduce task的拉取。
+
+**详细步骤：**
+
+- 读取数据组件InputFormat（默认TextInputFormat）会通过getSplits方法对输入目录中的文件进行逻辑切片规划得到block，有多少个block就对应启动多少个MapTask
+- 将输入文件切分为block之后，由RecordReader对象（默认是LineRecordReader）进行读取，以\n作为分隔符，读取一行数据，返回<key,value\>，Key表示每行首字符偏移值，Value表示这一行文本内容
+- 读取block返回<key,value\>，进入用户自己继承的Mapper类中，执行用户重写的map函数，RecordReader读取一行这里调用一次
+- Mapper逻辑结束之后，将Mapper的每条结果通过context.write进行collect数据收集，在collect中，会先对其进行分区处理，默认使用HashPartitioner
+- 接下来，会将数据写入内存，内存中的这边区域叫做环形缓冲区（默认100M），缓冲区的作用是批量收集Mapper结果，减少磁盘IO的影响，我们的Key/Value对以及Partition的结果都会被写入缓冲区，当然，写入之前，Key与Value值都会被序列化成字节数组
+- 当环形缓冲区的数据达到溢写比例（默认0.8），也就是80M时，溢写线程启动，需要对这80MB空间内的Key做排序（Sort）。排序是MapReduce模型默认的行为，这里的排序也是对序列化的字节做的排序
+- 合并溢写文件，每次溢写会在磁盘上生成一个临时文件（写文件判断是否有Combiner），如果Mapper的输出结果真的很大，有多次这样的溢写发生，磁盘上对应的就会有多个临时文件存在，当整个数据处理结束之后开始对磁盘中的临时文件进行Merge合并，因为最终的文件只有一个，写入磁盘，并且为这个文件提供了一个索引文件，以记录每个reduce对应数据的偏移量
+
+##### 12. 请说下MR中的Reduce Task的工作机制？
+
+**简单概述：**Reduce大致分为copy、sort、reduce三个阶段，重点在前两个阶段。copy阶段包含一个eventFetcher来获取已完成的map列表，由Fetcher线程去copy数据，在此过程中会启动两个merge线程，分别为inMemoryMerger和onDiskMerger，分别将内存中的数据merge到磁盘和磁盘中的数据进行merge。待数据copy完成之后，copy阶段就完成了，开始进行sort阶段，sort阶段主要是执行finalMerge操作，纯粹的sort阶段，完成之后就是reduce阶段，调用用户定义的reduce函数进行处理。
+
+##### 13. 请说下MR中shuffle阶段？
 
 shuffle阶段分为四个步骤：依次为：分区、排序、规约、分组，其中前三个步骤在map阶段完成，最后一个步骤在reduce阶段完成。shuffle是MapReduce的核心，它分布在MapReduce的map和reduce阶段。一般把从Map产生输出开始到Reduce取得数据作为输入之前的过程称之为shuffle。
 
@@ -73,21 +138,21 @@ shuffle阶段分为四个步骤：依次为：分区、排序、规约、分组�
 
 shuffle中的缓冲区大小会影响到MapReduce程序的执行效率，原则上说，缓冲区越大，磁盘IO的次数越少，执行速度就越快。缓冲区的大小可以通过参数调整，参数：`mapreduce.task.io.sort.mb`，默认为100MB。
 
-##### 13. shuffle阶段的数据压缩机制了解吗？
+##### 14. shuffle阶段的数据压缩机制了解吗？
 
 在shuffle阶段，可以看到数据通过大量的拷贝，从map阶段输出的数据，都要通过网络拷贝，发送到reduce阶段，这一过程中，涉及到大量的网络IO，如果数据能够进行压缩，那么数据的发送量就会少的多。
 
 hadoop当中支持的压缩算法：gzip、bzip2、LZO、LZ4、Snappy，这几种压缩算法综合压缩和解压缩的速率，谷歌的Snappy是最优的，一般都选择Snappy压缩。
 
-##### 14. 在写MR时，什么情况下可以使用规约？
+##### 15. 在写MR时，什么情况下可以使用规约？
 
 规约（combiner）是不能够影响任务的运行结果的，局部汇总，适用于求和类，不适用于求平均值，如果reduce的输入参数类型和输出参数类型是一样的，则规约的类可以使用reduce类，只需要在驱动类中指明规约的类即可。
 
-##### 15. yarn集群的架构和工作原理知道多少？
+##### 16. yarn集群的架构和工作原理知道多少？
 
-##### 16. yarn的任务提交流程是怎样的？
+##### 17. yarn的任务提交流程是怎样的？
 
-##### 17. yarn的资源调度三种模型了解吗？
+##### 18. yarn的资源调度三种模型了解吗？
 
 在Yarn中有三种调度器可以选择：FIFO Scheduler，Capacity Scheduler，Fair Scheduler。apache版本的hadoop默认使用的是Capacity Scheduler调度方式。CDH版本的默认使用的是Fair Scheduler调度方式。
 
