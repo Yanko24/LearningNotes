@@ -4,7 +4,11 @@
 
 **HDFS读流程：**
 
+
+
 **HDFS写流程：**
+
+
 
 ##### 2. HDFS在读取文件的时候，如果其中一个块突然损坏了怎么办？
 
@@ -104,7 +108,9 @@ Hadoop上大量HDFS元数据信息存储在NameNode内存中，因此过多的�
 
 ##### 11. 请说下MR中的Map Task的工作机制？
 
-**简单概述：**inputFile通过split被切割为多个split文件，通过Record按行读取内容给map（自己写的处理逻辑的方法），数据被map处理完之后交给OutputCollect收集器，对其结果key进行分区（默认使用的hashPartitioner），然后写入buffer，每个map task都有一个内存缓冲区（环形缓冲区），存放着map的输出结果，当缓冲区快满的时候需要将缓冲区的数据以一个临时文件的方式溢写到磁盘，当整个map task结束后再对磁盘中的整个maptask产生的所有临时文件合并，生成最终的正式输出文件，然后等待reduce task的拉取。
+**简单概述：**
+
+inputFile通过split被切割为多个split文件，通过Record按行读取内容给map（自己写的处理逻辑的方法），数据被map处理完之后交给OutputCollect收集器，对其结果key进行分区（默认使用的hashPartitioner），然后写入buffer，每个map task都有一个内存缓冲区（环形缓冲区），存放着map的输出结果，当缓冲区快满的时候需要将缓冲区的数据以一个临时文件的方式溢写到磁盘，当整个map task结束后再对磁盘中的整个maptask产生的所有临时文件合并，生成最终的正式输出文件，然后等待reduce task的拉取。
 
 **详细步骤：**
 
@@ -118,23 +124,20 @@ Hadoop上大量HDFS元数据信息存储在NameNode内存中，因此过多的�
 
 ##### 12. 请说下MR中的Reduce Task的工作机制？
 
-**简单概述：**Reduce大致分为copy、sort、reduce三个阶段，重点在前两个阶段。copy阶段包含一个eventFetcher来获取已完成的map列表，由Fetcher线程去copy数据，在此过程中会启动两个merge线程，分别为inMemoryMerger和onDiskMerger，分别将内存中的数据merge到磁盘和磁盘中的数据进行merge。待数据copy完成之后，copy阶段就完成了，开始进行sort阶段，sort阶段主要是执行finalMerge操作，纯粹的sort阶段，完成之后就是reduce阶段，调用用户定义的reduce函数进行处理。
+**简单概述：**
+
+Reduce大致分为copy、sort、reduce三个阶段，重点在前两个阶段。copy阶段包含一个eventFetcher来获取已完成的map列表，由Fetcher线程去copy数据，在此过程中会启动两个merge线程，分别为inMemoryMerger和onDiskMerger，分别将内存中的数据merge到磁盘和磁盘中的数据进行merge。待数据copy完成之后，copy阶段就完成了，开始进行sort阶段，sort阶段主要是执行finalMerge操作，纯粹的sort阶段，完成之后就是reduce阶段，调用用户定义的reduce函数进行处理。
 
 ##### 13. 请说下MR中shuffle阶段？
 
 shuffle阶段分为四个步骤：依次为：分区、排序、规约、分组，其中前三个步骤在map阶段完成，最后一个步骤在reduce阶段完成。shuffle是MapReduce的核心，它分布在MapReduce的map和reduce阶段。一般把从Map产生输出开始到Reduce取得数据作为输入之前的过程称之为shuffle。
 
-**Collect阶段：**将MapTask的结果输出到默认大小为100M的环形缓冲区，保存的是key/value，Partition分区信息等。
-
-**Spill阶段：**当内存中的数据量达到一定阈值的时候，就会将数据写入本地磁盘，在将数据写入磁盘之前需要对数据进行一次排序操作，如果配置了全局的combiner，还会将有相同分区号和key的数据进行排序。
-
-**Merge阶段：**把所有溢出的临时文件进行一次合并操作，以确保一个MapTask最终只产生一个中间数据文件。
-
-**Copy阶段：**ReduceTask启动Fetcher线程到已经完成MapTask的节点上复制一份属于自己的数据，这些数据默认会保存在内存的缓冲区汇中，当内存的缓冲区达到一定阈值的时候，就会将数据写到磁盘上。
-
-**Merge阶段：**在RecudeTask远程复制数据的同时，会在后台开启两个线程对内存到本地的数据文件进行合并操作。
-
-**Sort阶段：**在对数据进行合并的同时，会进行排序操作，由于MapTask阶段已经对数据做了局部的排序，ReduceTask只需要保证Copy的数据的最终整体有序性即可。
+- Collect阶段：将MapTask的结果输出到默认大小为100M的环形缓冲区，保存的是key/value，Partition分区信息等。
+- Spill阶段：当内存中的数据量达到一定阈值的时候，就会将数据写入本地磁盘，在将数据写入磁盘之前需要对数据进行一次排序操作，如果配置了全局的combiner，还会将有相同分区号和key的数据进行排序。
+- Merge阶段：把所有溢出的临时文件进行一次合并操作，以确保一个MapTask最终只产生一个中间数据文件。
+- Copy阶段：ReduceTask启动Fetcher线程到已经完成MapTask的节点上复制一份属于自己的数据，这些数据默认会保存在内存的缓冲区汇中，当内存的缓冲区达到一定阈值的时候，就会将数据写到磁盘上。
+- Merge阶段：在RecudeTask远程复制数据的同时，会在后台开启两个线程对内存到本地的数据文件进行合并操作。
+- Sort阶段：在对数据进行合并的同时，会进行排序操作，由于MapTask阶段已经对数据做了局部的排序，ReduceTask只需要保证Copy的数据的最终整体有序性即可。
 
 shuffle中的缓冲区大小会影响到MapReduce程序的执行效率，原则上说，缓冲区越大，磁盘IO的次数越少，执行速度就越快。缓冲区的大小可以通过参数调整，参数：`mapreduce.task.io.sort.mb`，默认为100MB。
 
