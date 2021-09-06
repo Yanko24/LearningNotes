@@ -18,6 +18,25 @@
 
 ##### 4. NameNode在启动时会做那些操作？
 
+NameNode数据存储在内存和本地磁盘，本地磁盘数据存储在fsimage镜像文件和edits编辑日志文件。
+
+- 首次启动NameNode
+  - 格式化文件系统，为了生成fsimage镜像文件
+  - 启动NameNode
+    - 读取fsimage文件，将文件内存加载进内存
+    - 等待DataNode注册与发送block report
+  - 启动DataNode
+    - 向NameNode注册
+    - 发送block report
+    - 检查fsimage中记录的块数量和block report中的块的总数是否相同
+  - 对文件系统进行操作（创建目录，上传文件，删除文件等）
+    - 此时内存中已经有文件系统改变的信息，但是磁盘中没有文件系统改变的信息，此时会将这些改变信息写入edits文件中，edits文件中存储的是文件系统元数据改变的信息
+- 第二次启动NameNode
+  - 读取fsimage和edits文件
+  - 将fsimage和edits文件合并成新的fsimage文件
+  - 创建新的edits文件，内容为空
+  - 启动DataNode
+
 ##### 5. Secondary NameNode了解吗？它的工作机制是怎样的？
 
 ##### 6. Secondary NameNode不能恢复NameNode的全部数据，那如何保证NameNode数据存储安全？
