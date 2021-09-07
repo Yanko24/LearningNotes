@@ -4,11 +4,23 @@
 
 **HDFS读流程：**
 
-
-
 **HDFS写流程：**
 
+- client客户端发送上传请求，通过RPC和namenode建立通信，namenode检查该用户是否有上传权限，以及上传的文件是否在HDFS对应的目录下重名，如果这两者有任意一个不满足，则直接报错，如果两者都满足，则返回给客户端一个可以上传的信息。
 
+- client根据文件的大小进行切分，默认128M一块，切分完成之后给namenode发送请求第一个block块上传到那些服务器上。
+
+- namenode收到请求之后，根据网络拓扑和机架感知以及副本机制进行文件分配，返回可用的DataNode的地址。
+
+  > Hadoop在设计时考虑到数据的安全与高效，数据文件默认在HDFS上存放三份，存储策略为本地一份，同机架内其他某一个节点上一份，不同机架的某一个节点上一份。
+
+- 客户端收到地址之后与服务器地址列表中的一个节点如A进行通信，本质上就是RPC调用，建立pipeline，A收到请求之后会继续调用B，B再调用C，将整个pipeline建立完成，逐级返回client。
+
+- client开始向A上发送第一个block（先从磁盘读取数据然后放到本地内存缓存），以packet（数据包，64KB）为单位，A收到一个packet就会发送给B，然后B发送给C，A每传完一个packet就会放入一个应答队列等待应答。
+
+- 数据被分割成一个个的packet数据包在pipeline上依次传输，在pipeline反向传输中，逐个发送ack（命令正确应答），最终由pipeline中第一个DataNode节点A将pipelineack发送给client。
+
+- 当一个block传输完成之后，client再次请求NameNode上传第二个block，namenode重新选择三台DataNode给client。
 
 ##### 2. HDFS在读取文件的时候，如果其中一个块突然损坏了怎么办？
 
@@ -69,7 +81,7 @@ NameNode共享存储方案有很多，比如Linux HA，VMware FT，QJM等，目�
 
 ##### 8. 在NameNode HA中，为什么会出现脑裂问题？怎么解决脑裂？
 
-假设NameNode1当前为Active状态，NameNode2当前为standby状态。如果某一时刻NameNode1对应的ZFFailoverController进程发生了“假死”现象，那么Zookeeper服务端会认为NameNode1挂掉了，根据前面的主备切换逻辑，NameNode2会替代NameNode1进入Active状态。但是此时NameNode1可能扔处于Active状态正常运行，这样NameNode1和NameNode2都处于Active状态，都可以对外提供服务。这种情况称为脑裂。
+> 假设NameNode1当前为Active状态，NameNode2当前为standby状态。如果某一时刻NameNode1对应的ZFFailoverController进程发生了“假死”现象，那么Zookeeper服务端会认为NameNode1挂掉了，根据前面的主备切换逻辑，NameNode2会替代NameNode1进入Active状态。但是此时NameNode1可能扔处于Active状态正常运行，这样NameNode1和NameNode2都处于Active状态，都可以对外提供服务。这种情况称为脑裂。
 
 脑裂对于NameNode这类对数据一致性要求非常高的系统来说是灾难性的，数据会发生错乱且无法恢复。Zookeeper社区对这种问题的解决方法叫做fencing，中文翻译为隔离，也就是想办法把旧的Active NameNode隔离起来，使它不能正常对外提供服务。
 
@@ -114,19 +126,26 @@ inputFile通过split被切割为多个split文件，通过Record按行读取内�
 
 **详细步骤：**
 
-- 读取数据组件InputFormat（默认TextInputFormat）会通过getSplits方法对输入目录中的文件进行逻辑切片规划得到block，有多少个block就对应启动多少个MapTask
-- 将输入文件切分为block之后，由RecordReader对象（默认是LineRecordReader）进行读取，以\n作为分隔符，读取一行数据，返回<key,value\>，Key表示每行首字符偏移值，Value表示这一行文本内容
-- 读取block返回<key,value\>，进入用户自己继承的Mapper类中，执行用户重写的map函数，RecordReader读取一行这里调用一次
-- Mapper逻辑结束之后，将Mapper的每条结果通过context.write进行collect数据收集，在collect中，会先对其进行分区处理，默认使用HashPartitioner
-- 接下来，会将数据写入内存，内存中的这边区域叫做环形缓冲区（默认100M），缓冲区的作用是批量收集Mapper结果，减少磁盘IO的影响，我们的Key/Value对以及Partition的结果都会被写入缓冲区，当然，写入之前，Key与Value值都会被序列化成字节数组
-- 当环形缓冲区的数据达到溢写比例（默认0.8），也就是80M时，溢写线程启动，需要对这80MB空间内的Key做排序（Sort）。排序是MapReduce模型默认的行为，这里的排序也是对序列化的字节做的排序
-- 合并溢写文件，每次溢写会在磁盘上生成一个临时文件（写文件判断是否有Combiner），如果Mapper的输出结果真的很大，有多次这样的溢写发生，磁盘上对应的就会有多个临时文件存在，当整个数据处理结束之后开始对磁盘中的临时文件进行Merge合并，因为最终的文件只有一个，写入磁盘，并且为这个文件提供了一个索引文件，以记录每个reduce对应数据的偏移量
+- 读取数据组件InputFormat（默认TextInputFormat）会通过getSplits方法对输入目录中的文件进行逻辑切片规划得到block，有多少个block就对应启动多少个MapTask。
+- 将输入文件切分为block之后，由RecordReader对象（默认是LineRecordReader）进行读取，以\n作为分隔符，读取一行数据，返回<key,value\>，Key表示每行首字符偏移值，Value表示这一行文本内容。
+- 读取block返回<key,value\>，进入用户自己继承的Mapper类中，执行用户重写的map函数，RecordReader读取一行这里调用一次。
+- Mapper逻辑结束之后，将Mapper的每条结果通过context.write进行collect数据收集，在collect中，会先对其进行分区处理，默认使用HashPartitioner。
+- 接下来，会将数据写入内存，内存中的这边区域叫做环形缓冲区（默认100M），缓冲区的作用是批量收集Mapper结果，减少磁盘IO的影响，我们的Key/Value对以及Partition的结果都会被写入缓冲区，当然，写入之前，Key与Value值都会被序列化成字节数组。
+- 当环形缓冲区的数据达到溢写比例（默认0.8），也就是80M时，溢写线程启动，需要对这80MB空间内的Key做排序（Sort）。排序是MapReduce模型默认的行为，这里的排序也是对序列化的字节做的排序。
+- 合并溢写文件，每次溢写会在磁盘上生成一个临时文件（写文件判断是否有Combiner），如果Mapper的输出结果真的很大，有多次这样的溢写发生，磁盘上对应的就会有多个临时文件存在，当整个数据处理结束之后开始对磁盘中的临时文件进行Merge合并，因为最终的文件只有一个，写入磁盘，并且为这个文件提供了一个索引文件，以记录每个reduce对应数据的偏移量。
 
 ##### 12. 请说下MR中的Reduce Task的工作机制？
 
 **简单概述：**
 
 Reduce大致分为copy、sort、reduce三个阶段，重点在前两个阶段。copy阶段包含一个eventFetcher来获取已完成的map列表，由Fetcher线程去copy数据，在此过程中会启动两个merge线程，分别为inMemoryMerger和onDiskMerger，分别将内存中的数据merge到磁盘和磁盘中的数据进行merge。待数据copy完成之后，copy阶段就完成了，开始进行sort阶段，sort阶段主要是执行finalMerge操作，纯粹的sort阶段，完成之后就是reduce阶段，调用用户定义的reduce函数进行处理。
+
+**详细步骤：**
+
+- Copy阶段：简单地拉取数据。Reduce进程启动一些数据copy线程（Fetcher），通过HTTP方式请求maptask获取属于自己的文件（map task的分区会标识每个map task属于哪个reduce task，默认reduce task的标识从0开始）。
+- Merge阶段：这里的merge如map端的merge动作，只是数组中存放的是不同map端copy来的数值。Copy过来的数据会先放入内存缓冲区中，这里的缓冲区大小要比map端的更为灵活。merge有三种形式：内存到内存；内存到磁盘；磁盘到磁盘。默认情况下第一种形式不启动。当内存中的数据量到达一定阈值，就启动内存到磁盘的merge。与map端类似，这也是溢写的过程，这个过程中如果设置了Combiner，也是会启用的，然后在磁盘中生成了众多的溢写文件。第二种merge方式一直在运行，直到没有map端的数据时才结束，然后启动第三种磁盘到磁盘的merge方式生成最终的文件。
+- 合并排序：把分散的数据合并成一个大的数据后，还会再对合并后的数据排序。
+- 对排序后的键值对调用reduce方法：键相等的键值对调用一次reduce方法，每次调用会产生零个或者多个键值对，最后把这些输出的键值对写入到HDFS文件中。
 
 ##### 13. 请说下MR中shuffle阶段？
 
@@ -139,7 +158,7 @@ shuffle阶段分为四个步骤：依次为：分区、排序、规约、分组�
 - Merge阶段：在RecudeTask远程复制数据的同时，会在后台开启两个线程对内存到本地的数据文件进行合并操作。
 - Sort阶段：在对数据进行合并的同时，会进行排序操作，由于MapTask阶段已经对数据做了局部的排序，ReduceTask只需要保证Copy的数据的最终整体有序性即可。
 
-shuffle中的缓冲区大小会影响到MapReduce程序的执行效率，原则上说，缓冲区越大，磁盘IO的次数越少，执行速度就越快。缓冲区的大小可以通过参数调整，参数：`mapreduce.task.io.sort.mb`，默认为100MB。
+> shuffle中的缓冲区大小会影响到MapReduce程序的执行效率，原则上说，缓冲区越大，磁盘IO的次数越少，执行速度就越快。缓冲区的大小可以通过参数调整，参数：`mapreduce.task.io.sort.mb`，默认为100MB。
 
 ##### 14. shuffle阶段的数据压缩机制了解吗？
 
@@ -153,7 +172,37 @@ hadoop当中支持的压缩算法：gzip、bzip2、LZO、LZ4、Snappy，这几�
 
 ##### 16. yarn集群的架构和工作原理知道多少？
 
+YARN的基本设计思想是将MapReduce V1中的JobTracker拆分为两个独立的服务：ResourceManager和ApplicationMaster。ResourceManager负责整个系统的资源管理和分配，ApplicationMaster负责单个应用程序的管理。
+
+- ResourceManager：RM是一个全局的资源管理器，负责整个系统的资源管理和分配，它主要由两个部分组成：调度器（Scheduler）和应用程序管理器（Application Manager）。调度器根据容量、队列等限制条件，将系统中的资源分配给正在运行的应用程序，在保证容量、公平性和服务等级的前提下，优化集群资源利用率，让所有的资源都被充分利用。应用程序管理器负责管理整个系统中的所有的应用程序，包括应用程序的提交、与调度器协调资源以启动ApplicationMaster、监控ApplicationMaster运行状态并在失败时重启它。
+
+- ApplicationMaster：用户提交的一个应用程序会对应一个ApplicationMaster，它的主要功能有：
+
+  - 与RM调度器协商以获得资源，资源以Container表示。
+
+  - 将得到的任务进一步分配给内部的任务。
+
+  - 与NN通信以启动/停止任务。
+
+  - 监控所有的内部任务状态，并在任务运行失败的时候重新为任务申请资源以重启任务。
+
+- NodeManager：NodeManager是每个节点上的资源和任务管理器，一方面，它会定期地向RM汇报本节点上的资源使用情况和各个Container的运行状态；另一方面，他接收并处理来自AM的Container的启动和停止请求。
+
+- Container：Container是YARN中的资源抽象，封装了各种资源。一个应用程序会分配一个Container，这个应用程序只能使用这个Container中描述的资源。不同于MapReduce V1中槽位slot的资源封装，Container是一个动态资源的划分单位，更能充分的利用资源。
+
 ##### 17. yarn的任务提交流程是怎样的？
+
+当JobClient向YARN提交一个应用程序后，YARN将分两个阶段运行这个应用程序：一是启动ApplicationMaster，第二阶段是由ApplicationMaster创建应用程序，为它申请资源，监控运行直到结束。具体步骤如下：
+
+- 用户向YARN提交一个应用程序，并指定ApplicationMaster程序、启动ApplicationMaster的命令、用户程序。
+- RM为这个应用程序分配第一个Container，并与之对应的NM通讯，要求它在这个Container中启动应用程序ApplicationMaster。
+- ApplicationMaster向RM注册，然后拆分为内部各个子任务，为各个内部任务申请资源，并监控这些任务的运行，直到结束。
+- AM采用轮询的方式向RM申请和领取资源。
+- RM为AM分配资源，以Container形式返回。
+- AM申请到资源后，便于之对应的NM通讯，要求NM启动任务。
+- NodeManager为任务设置好运行环境，将任务启动命令写到一个脚本中，并通过运行这个脚本启动任务。
+- 各个任务向AM汇报自己的状态和进度，以便当任务失败时可以重启任务。
+- 应用程序完成后，ApplicationMaster向ResourceManager注销并关闭自己。
 
 ##### 18. yarn的资源调度三种模型了解吗？
 
