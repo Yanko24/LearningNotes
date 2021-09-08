@@ -73,6 +73,8 @@
 
 #### 二、Hadoop
 
+1.[Hadoop的MapReduce执行流程](http://typora-image.test.upcdn.net/images/mapreduce%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png)
+
 #### 三、Hive
 
 1.[Hive元数据库模型图](http://typora-image.test.upcdn.net/images/20200904223941.png)
