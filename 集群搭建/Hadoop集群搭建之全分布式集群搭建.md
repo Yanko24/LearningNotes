@@ -4,7 +4,7 @@
 
 准备三台已经安装了CentOS7系统的虚拟机，并进行了相关设置。
 
-系统配置可以参考[Hadoop集群搭建之CentOS7系统配置](https://github.com/yangqi199808/BigData-Home/blob/master/Hadoop/1.Hadoop集群搭建之CentOS7系统配置.md)这篇文章。
+系统配置可以参考[Hadoop集群搭建之CentOS7系统配置](/Hadoop/1.Hadoop集群搭建之CentOS7系统配置.md)这篇文章。
 
 ##### 2. 集群规划
 
