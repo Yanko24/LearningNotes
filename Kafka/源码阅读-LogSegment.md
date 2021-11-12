@@ -23,9 +23,47 @@ rollJitterMs：The maximum random jitter subtracted from the scheduled segment r
 time：计时统计的实例
 ```
 
-##### 2. 更新index和timeindex方法
+##### 2. append执行流程
 
 ![](images/LogSegment-append.jpg)
+
+执行流程图如下：
+
+![](images/Kafka-LogSegment.jpg)
+
+步骤：
+
+- 判断消息内容是否为空
+
+  ![](images/LogSegment-message.jpg)
+
+- 判断log文件的物理偏移量是否为0
+
+  ![](images/LogSegment-log.jpg)
+
+- 校验消息偏移量offset合法
+
+  ![](images/LogSegment-offset.jpg)
+
+  ![](images/LogSegment-offset-ensure.jpg)
+
+- 写入消息
+
+  ![](images/LogSegment-record.jpg)
+
+- 更新当前最大时间戳和所属消息偏移量
+
+  ![](images/LogSegment-update.jpg)
+
+- 当写入字节数大于4K，新增索引
+
+  ![](images/LogSegment-addindex.jpg)
+
+- 更新已写入字节数
+
+  ![](images/LogSegment-updatebytes.jpg)
+
+##### 3. 更新index和timeindex方法
 
 offsetIndex的append方法：
 

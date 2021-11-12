@@ -4,7 +4,7 @@
 
 
 
-### 大数据框架
+### 大数据组件
 
 <table>
     <tr align="center">
@@ -24,6 +24,18 @@
       <td><a href="#五Flink">Flink</a></td>
       <td><a href="#六HBase">HBase</a></td>
       <td><a href="#七Kafka">Kafka</a></td>
+    </tr>
+</table>
+<br>
+
+### 大数据源码
+
+<table>
+    <tr align="center">
+        <th><a href="#一Kafka源码"><img width="50px" src="images/kafka.png"></a></th>
+    </tr>
+    <tr align="center">
+      <td><a href="#一Kafka源码">Kafka</a></td>
     </tr>
 </table>
 
@@ -49,8 +61,6 @@
       <td><a href="#六Kafka面试题">Kafka面试题</a></td>
     </tr>
 </table>
-
-
 <br>
 
 ### 第一部分：大数据框架
@@ -135,9 +145,21 @@
 
 #### 七、Kafka
 
+1.[Kafka的日志存储](Kafka/Kafka的日志存储.md)
+
 <br>
 
-### 第二部分：大数据面试
+### 第二部分：源码阅读
+
+---
+
+#### 一、Kafka源码
+
+1.[源码阅读-LogSegment](Kafka/源码阅读-LogSegment.md)
+
+<br>
+
+### 第三部分：大数据面试
 
 ---
 
