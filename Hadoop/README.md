@@ -6,9 +6,9 @@
 
 <br>
 
-#### 一、Hadoop框架学习
+#### 一、Hadoop组件学习
 
-1.[Hadoop的MapReduce执行流程](http://typora-image.test.upcdn.net/images/mapreduce%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png)
+1.[Hadoop的MapReduce执行流程](images/mapreduce执行流程.jpg)
 
 <br>
 

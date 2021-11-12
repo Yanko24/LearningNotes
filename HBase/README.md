@@ -4,7 +4,7 @@
 
 从零开始记录自己学习HBase的过程以及自己遇见的一些错误的解决办法。
 
-#### 一、HBase框架学习
+#### 一、HBase组件学习
 
 1.[DBeaver连接Phoenix](DBeaver连接Phoenix.md)
 

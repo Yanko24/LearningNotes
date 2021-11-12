@@ -6,7 +6,7 @@
 
 <br>
 
-#### 一、Hive框架学习
+#### 一、Hive组件学习
 
 1.[Hive元数据库模型图](http://typora-image.test.upcdn.net/images/20200904223941.png)
 
