@@ -65,8 +65,6 @@ baseOffset: 38 lastOffset: 41 count: 4 baseSequence: -1 lastSequence: -1 produce
 
 从以上内容可以看到的的消息是：baseOffset从0开始，到offset为31结束的消息段中存储了32条消息，时间戳是1636617435886，大小为4961K，压缩类型为NONE。
 
-###### 1. 日志清理机制
-
 kafka提供了两种清理策略：日志删除和日志压缩，可以通过参数`log.cleaner.policy`进行配置，参数可选[compact, delete]。
 
 日志删除：按照一定的策略，将不满足的数据进行删除。日志删除的配置如下：
