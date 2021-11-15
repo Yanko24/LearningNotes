@@ -1,4 +1,4 @@
-#### Kafka源码阅读-LogSegment
+#### 源码阅读-LogSegment
 
 日志段代码解析地址位于core工程下的/scala/log/LogSegment.scala。
 
