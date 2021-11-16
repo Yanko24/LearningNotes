@@ -12,6 +12,8 @@
 
 1.[源码阅读-LogSegment](源码阅读-LogSegment.md)
 
+2.[源码阅读-Record](源码阅读-Record.md)
+
 #### 三、Kafka面试题
 
 1.[Kafka常见的面试题](Kafka常见的面试题.md)

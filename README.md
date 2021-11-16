@@ -157,6 +157,8 @@
 
 1.[源码阅读-LogSegment](Kafka/源码阅读-LogSegment.md)
 
+2.[源码阅读-Record](Kafka/源码阅读-Record.md)
+
 <br>
 
 ### 第三部分：大数据面试
