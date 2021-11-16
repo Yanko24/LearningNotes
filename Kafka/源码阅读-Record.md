@@ -2,17 +2,17 @@
 
 Kafka消息格式相关的代码位于clients工程下的`/java/org/apache/kafka/common/record`包下。
 
-![](images/record.jpg)
+![](images/Record.jpg)
 
 类之间的关系图如下所示：
 
-![](images/record-uml.jpg)
+![](images/Record-uml.jpg)
 
 ##### 1. DefaultRecord（默认消息）
 
 类中的消息格式定义（org.apache.kafka.common.record.DefaultRecord）：
 
-![](images/defaultRecord.jpg)
+![](images/DefaultRecord.jpg)
 
 |    字段     |         说明         |
 | :---------: | :------------------: |
