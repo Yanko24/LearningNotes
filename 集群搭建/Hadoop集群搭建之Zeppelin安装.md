@@ -2,23 +2,23 @@
 
 ##### 1. 准备工作
 
-下载Zeppelin的安装包上传到集群中的某台服务器中
+下载Zeppelin的安装包上传到集群中的某台服务器中，[下载 地址](https://downloads.apache.org/zeppelin/)
 
 ##### 2. Zeppelin安装
 
 ###### 1. 安装目录规划
 
 ```
-统一安装路径：/opt/apps
+统一安装路径：/opt/modules
 统一软件存放路径：/opt/software
 ```
 
 ###### 2. 上传压缩包
 
 ```
-1. 将压缩包上传到[/opt/software]目录下，解压到[/opt/apps]目录下
+1. 将压缩包上传到[/opt/software]目录下，解压到[/opt/modules]目录下
 2. 修改[/home/hadoop/.bash_profile]文件，增加以下内容：
-	ZEPPELIN_HOME=/opt/apps/zeppelin-0.9.0
+	ZEPPELIN_HOME=/opt/modules/zeppelin
 	PATH=$ZEPPELIN_HOME/bin:$PATH
 	export ZEPPELIN_HOME PATH
 3. 使用[source ~/.bash_profile]使其生效
@@ -26,16 +26,16 @@
 
 ###### 3. Zeppelin配置
 
-配置文件目录：【/opt/apps/zeppelin-0.9.0/conf】
+配置文件目录：【/opt/modules/zeppelin/conf】
 
 - zeppelin-env.sh
 
   需要将`zeppelin-env.sh.template`复制一份为`zeppelin-env.sh`
 
   ```shell
-  export JAVA_HOME=/opt/apps/jdk1.8.0_162
+  export JAVA_HOME=/opt/modules/jdk
   # zeppelin 启动的地址
-  export ZEPPELIN_ADDR=slave2
+  export ZEPPELIN_ADDR=hadoop01
   # zeppelin 启动的端口号
   export ZEPPELIN_PORT=9090
   ```

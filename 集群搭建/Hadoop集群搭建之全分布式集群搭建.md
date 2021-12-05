@@ -2,52 +2,57 @@
 
 ##### 1. 准备工作
 
-准备三台已经安装了CentOS7系统的虚拟机，并进行了相关设置。
+准备四台已经安装了CentOS7系统的虚拟机，并进行了相关设置。
 
 系统配置可以参考[Hadoop集群搭建之CentOS7系统配置](/集群搭建/Hadoop集群搭建之CentOS7系统配置.md)这篇文章。
+
+集群版本规划：
+
+|  组件  | 版本  |
+| :----: | :---: |
+| hadoop | 3.3.1 |
+|  hive  | 3.1.2 |
+| hbase  | 2.4.8 |
 
 ##### 2. 集群规划
 
 | 主机名称 |     IP地址     |  用户  |            HDFS             |             YARN             |
 | :------: | :------------: | :----: | :-------------------------: | :--------------------------: |
-|  master  | 192.168.21.210 | hadoop |     NameNode，DataNode      | ResourceManager，NodeManager |
-|  slave1  | 192.168.21.211 | hadoop | DataNode，SecondaryNameNode |         NodeManager          |
-|  slave2  | 192.168.21.212 | hadoop |          DataNode           |         NodeManager          |
+| hadoop01 | 192.168.21.211 | hadoop |     NameNode，DataNode      | ResourceManager，NodeManager |
+| hadoop02 | 192.168.21.212 | hadoop | DataNode，SecondaryNamenode |         NodeManager          |
+| hadoop03 | 192.168.21.213 | hadoop |          DataNode           |         NodeManager          |
+| hadoop04 | 192.168.21.214 | hadoop |          DataNode           |         NodeManager          |
 
 ##### 3. Hadoop安装
 
 ###### 1. 安装目录规划
 
 ```
-统一安装路径：/opt/apps
+统一安装路径：/opt/modules
 统一软件存放路径：/opt/software
 ```
 
 ###### 2. 上传压缩包
 
 ```
-1. 将压缩包上传到[/opt/software]目录下，解压到[/opt/apps]目录下
-2. 修改[/home/hadoop/.bash_profile]文件，增加以下内容：
-	HADOOP_HOME=/opt/apps/hadoop-2.7.7
+1. 将压缩包上传到[/opt/software]目录下，解压到[/opt/modules]目录下
+2. 建立软链接
+	ln -s hadoop-3.3.1 hadoop
+3. 修改[/home/hadoop/.bash_profile]文件，增加以下内容：
+	HADOOP_HOME=/opt/modules/hadoop
 	PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 	export HADOOP_HOME PATH
-3. 使用[source ~/.bash_profile使其生效
+4. 使用[source ~/.bash_profile使其生效
 ```
 
 ###### 3. 集群配置
 
-配置文件目录：【/opt/apps/hadoop-2.7.7/etc/hadoop/】
+配置文件目录：【/opt/modules/hadoop/etc/hadoop/】
 
 - hadoop-env.sh
 
   ```
-  修改第25行JAVA_HOME的路径为[/opt/apps/jdk1.8.0_162]
-  ```
-
-- yarn-env.sh
-
-  ```
-  修改第23行JAVA_HOME的路径为[/opt/apps/jdk1.8.0_162]（记得取消注释）
+  修改第25行JAVA_HOME的路径为[/opt/modules/jdk]
   ```
 
 - core-site.xml
@@ -56,11 +61,11 @@
   <configuration>
       <property>
           <name>hadoop.tmp.dir</name>
-          <value>/opt/apps/hadoop-2.7.7/tmp</value>
+          <value>/opt/modules/hadoop/tmp</value>
       </property>
       <property>
           <name>fs.defaultFS</name>
-          <value>hdfs://master:8020</value>
+          <value>hdfs://hadoop01:8020</value>
       </property>
   </configuration>
   ```
@@ -79,15 +84,15 @@
       </property>
       <property>
           <name>dfs.namenode.secondary.http-address</name>
-          <value>slave1:50090</value>
+          <value>hadoop02:50090</value>
       </property>
       <property>
           <name>dfs.namenode.name.dir</name>
-          <value>/opt/apps/hadoop-2.7.7/tmp/namenode</value>
+          <value>/opt/modules/hadoop/tmp/namenode</value>
       </property>
       <property>
         	<name>dfs.datanode.data.dir</name>
-        	<value>/opt/apps/hadoop-2.7.7/tmp/datanode</value>
+        	<value>/opt/modules/hadoop/tmp/datanode</value>
       </property>
   </configuration>
   ```
@@ -104,11 +109,11 @@
       </property>
       <property>
           <name>mapreduce.jobhistory.address</name>
-          <value>master:10020</value>
+          <value>hadoop01:10020</value>
       </property>
       <property>
           <name>mapreduce.jobhistory.weapp.address</name>
-          <value>master:19888</value>
+          <value>hadoop01:19888</value>
       </property>
   </configuration>
   ```
@@ -119,7 +124,7 @@
   <configuration>
       <property>
           <name>yarn.resourcemanager.hostname</name>
-      	<value>master</value>
+      	<value>hadoop01</value>
       </property>
       <property>
           <name>yarn.nodemanager.aux-services</name>
@@ -131,7 +136,7 @@
       </property>
       <property>
   		<name>yarn.log.server.url</name>
-      	<value>http://master:19888/jobhistory/logs</value>
+      	<value>http://hadoop01:19888/jobhistory/logs</value>
   	</property>
   </configuration>
   ```
@@ -139,13 +144,13 @@
 - slaves
 
   ```
-  master
-  slave1
-  slave2
+  hadoop01
+  hadoop02
+  hadoop03
   ```
 
 
-使用[scp -r /opt/appshadoop-2.7.7 username@hostname:/opt/apps]命令将hadoop发送到三台服务器中
+使用[scp -r /opt/modules/hadoop hadoop@hostname:/opt/modules]命令将hadoop发送到三台服务器中
 
 ##### 4. Hadoop集群测试
 
@@ -164,8 +169,8 @@
 ###### 3. 集群测试
 
 ```
-1. 访问[192.168.21.210:50070]查看HDFS集群WebUI
-2. 访问[192.168.21.210:8088]查看YARN集群WebUI
+1. 访问[hadoop01:50070]查看HDFS集群WebUI
+2. 访问[hadoop01:8088]查看YARN集群WebUI
 ```
 
 ##### 5. Hadoop高可用集群
@@ -174,9 +179,10 @@
 
 | 主机名称 |     IP地址     |  用户  |              HDFS               |             YARN             |       ZK       |          ZKFC           |
 | :------: | :------------: | :----: | :-----------------------------: | :--------------------------: | :------------: | :---------------------: |
-|  master  | 192.168.21.210 | hadoop | NameNode，DataNode，JournalNode | ResourceManager，NodeManager | QuorumPeerMain | DFSZKFailoverController |
-|  slave1  | 192.168.21.211 | hadoop | Namenode，DataNode，JournalNode | ResourceManager，NodeManager | QuorumPeerMain | DFSZKFailoverController |
-|  slave2  | 192.168.21.212 | hadoop |      DataNode，JournalNode      |         NodeManager          | QuorumPeerMain |                         |
+| hadoop01 | 192.168.21.211 | hadoop |       NameNode，DataNode        | ResourceManager，NodeManager |                | DFSZKFailoverController |
+| hadoop02 | 192.168.21.212 | hadoop | Namenode，DataNode，JournalNode | ResourceManager，NodeManager | QuorumPeerMain | DFSZKFailoverController |
+| hadoop03 | 192.168.21.213 | hadoop |      DataNode，JournalNode      |         NodeManager          | QuorumPeerMain |                         |
+| hadoop04 | 192.168.21.214 | hadoop |      DataNode，JournalNode      |         NodeManager          | QuorumPeerMain |                         |
 
 ###### 2. Zookeeper安装
 
@@ -185,7 +191,7 @@
 + 上传压缩包并配置环境变量
 
   ```
-  ZOOKEEPER_HOME=/opt/apps/zookeeper-3.6.1
+  ZOOKEEPER_HOME=/opt/modules/zookeeper
   PATH=$ZOOKEEPER_HOME/bin:$PATH
   export ZOOKEEPER_HOME PATH
   ```
@@ -208,7 +214,7 @@
     # the directory where the snapshot is stored.
     # do not use /tmp for storage, /tmp here is just
     # example sakes.
-    dataDir=/opt/apps/zookeeper-3.6.1/data
+    dataDir=/opt/modules/zookeeper-3.6.1/data
     # the port at which the clients will connect
     clientPort=2181
     # the maximum number of client connections.
@@ -233,14 +239,14 @@
     #metricsProvider.httpPort=7000
     #metricsProvider.exportJvmInfo=true
     
-    server.1=master:2888:3888
-    server.2=slave1:2888:3888
-    server.3=slave2:2888:3888
+    server.1=hadoop02:2888:3888
+    server.2=hadoop03:2888:3888
+    server.3=hadoop04:2888:3888
     ```
 
   + myid
 
-    新建一个目录[data]，在data中新建一个文件[myid]，写上刚才IP地址所对应的[server.id]中的[id]值。（192.168.21.210填写1，其余的自行修改）
+    新建一个目录[data]，在data中新建一个文件[myid]，写上刚才IP地址所对应的[server.id]中的[id]值。（hadoop02填写1，其余的自行修改）
 
     ```
     1
@@ -252,19 +258,14 @@
 
 ###### 3. HA集群配置
 
-配置文件目录：【/opt/apps/hadoop-2.7.7/etc/hadoop/】
+配置文件目录：【/opt/modules/hadoop/etc/hadoop/】
 
 - hadoop-env.sh
 
   ```
-  修改第25行JAVA_HOME的路径为[/opt/apps/jdk1.8.0_162]
+  修改第25行JAVA_HOME的路径为[/opt/modules/jdk]
   ```
 
-- yarn-env.sh
-
-  ```
-  修改第23行JAVA_HOME的路径为[/opt/apps/jdk1.8.0_162]（记得取消注释）
-  ```
 
 
 + core-site.xml
@@ -273,7 +274,7 @@
   <configuration>
       <property>
           <name>hadoop.tmp.dir</name>
-          <value>/opt/apps/hadoop-2.7.7/tmp</value>
+          <value>/opt/modules/hadoop/data</value>
       </property>
       <property>
           <name>fs.defaultFS</name>
@@ -281,7 +282,15 @@
       </property>
       <property>
           <name>ha.zookeeper.quorum</name>
-          <value>master:2181,slave1:2181,slave2:2181</value>
+          <value>hadoop02:2181,hadoop03:2181,hadoop04:2181</value>
+      </property>
+      <property>
+          <name>hadoop.proxyuser.hadoop.hosts</name>
+          <value>*</value>
+      </property>
+      <property>
+          <name>hadoop.proxyuser.hadoop.groups</name>
+          <value>*</value>
       </property>
   </configuration>
   ```
@@ -308,35 +317,35 @@
       </property>
       <property>
           <name>dfs.namenode.rpc-address.supercluster.nn1</name>
-          <value>master:8020</value>
+          <value>hadoop01:8020</value>
       </property>
       <property>
           <name>dfs.namenode.rpc-address.supercluster.nn2</name>
-          <value>slave1:8020</value>
+          <value>hadoop02:8020</value>
       </property>
       <property>
           <name>dfs.namenode.http-address.supercluster.nn1</name>
-          <value>master:50070</value>
+          <value>hadoop01:50070</value>
       </property>
       <property>
           <name>dfs.namenode.http-address.supercluster.nn2</name>
-          <value>slave1:50070</value>
+          <value>hadoop02:50070</value>
       </property>
       <property>
           <name>dfs.namenode.shared.edits.dir</name>
-          <value>qjournal://master:8485;slave1:8485;slave2:8485/supercluster</value>
+          <value>qjournal://hadoop02:8485;hadoop03:8485;hadoop04:8485/supercluster</value>
       </property>
       <property>
           <name>dfs.journalnode.edits.dir</name>
-          <value>/opt/apps/hadoop-2.7.7/tmp/journaldata</value>
+          <value>/opt/modules/hadoop/data/journaldata</value>
       </property>
       <property>
           <name>dfs.namenode.name.dir</name>
-          <value>/opt/apps/hadoop-2.7.7/tmp/namenode</value>
+          <value>/opt/modules/hadoop/data/namenode</value>
       </property>
       <property>
         	<name>dfs.datanode.data.dir</name>
-        	<value>/opt/apps/hadoop-2.7.7/tmp/datanode</value>
+        	<value>/opt/modules/hadoop/data/datanode</value>
       </property>
       <property>
           <name>dfs.ha.automatic-failover.enabled</name>
@@ -371,11 +380,11 @@
       </property>
       <property>
           <name>mapreduce.jobhistory.address</name>
-          <value>master:10020</value>
+          <value>hadoop01:10020</value>
       </property>
       <property>
           <name>mapreduce.jobhistory.weapp.address</name>
-          <value>master:19888</value>
+          <value>hadoop01:19888</value>
       </property>
   </configuration>
   ```
@@ -398,15 +407,15 @@
       </property>
       <property>
           <name>yarn.resourcemanager.hostname.rm1</name>
-          <value>master</value>
+          <value>hadoop01</value>
       </property>
       <property>
           <name>yarn.resourcemanager.hostname.rm2</name>
-          <value>slave1</value>
+          <value>hadoop02</value>
       </property>
       <property>
           <name>yarn.resourcemanager.zk-address</name>
-          <value>master:2181,slave1:2181,slave2:2181</value>
+          <value>hadoop02:2181,hadoop03:2181,hadoop04:2181</value>
       </property>
       <property>
           <name>yarn.nodemanager.aux-services</name>
@@ -417,9 +426,33 @@
           <value>true</value>
       </property>
       <property>
-  		<name>yarn.log.server.url</name>
-      	<value>http://master:19888/jobhistory/logs</value>
-  	</property>
+  	<name>yarn.log.server.url</name>
+      	<value>http://hadoop01:19888/jobhistory/logs</value>
+      </property>
+      <property>  
+      	<name>yarn.resourcemanager.address.rm1</name>  
+      	<value>hadoop01:8032</value>  
+      </property> 
+      <property>
+      	<name>yarn.resourcemanager.scheduler.address.rm1</name>  
+      	<value>hadoop01:8030</value>  
+      </property>
+      <property>
+      	<name>yarn.resourcemanager.resource-tracker.address.rm1</name>  
+      	<value>hadoop01:8031</value>  
+      </property>
+      <property>
+      	<name>yarn.resourcemanager.address.rm2</name>
+      	<value>hadoop02:8032</value>
+      </property>
+      <property>
+      	<name>yarn.resourcemanager.scheduler.address.rm2</name>
+      	<value>hadoop02:8030</value>
+      </property>
+      <property>
+      	<name>yarn.resourcemanager.resource-tracker.address.rm2</name>
+      	<value>hadoop02:8031</value>
+      </property>
   </configuration>
   ```
 
@@ -428,48 +461,40 @@
 + 首先停止原有集群，启动[journalnode]（三台都要启动）
 
   ```shell
-  [hadoop@master ~]$ hadoop-daemon.sh start journalnode
-  [hadoop@slave1 ~]$ hadoop-daemon.sh start journalnode
-  [hadoop@slave2 ~]$ hadoop-daemon.sh start journalnode
+  hdfs --daemon start journalnode
   ```
-
+  
 + 启动原有节点上的[namenode]
 
   ```shell
-  [hadoop@master ~]$ hadoop-daemon.sh start namenode
+  hdfs --daemon start namenode
   ```
 
 + 在新的[namenode]上拉取集群镜像文件
 
   ```shell
-  [hadoop@slave1 ~]$ hdfs namenode -bootstrapStandby
+  hdfs namenode -bootstrapStandby
   ```
 
-+ 停止原有集群的[namenode]，同步数据到[journalnode]
++ 停止原有集群的[namenode]
 
   ```shell
-  [hadoop@master ~]$ hadoop-daemon.sh stop namenode
-  [hadoop@master ~]$ hdfs namenode -initializeSharedEdits
+  hdfs --daemon stop namenode
   ```
-
+  
 + 格式化ZKFC集群
 
   ```shell
-  [hadoop@master ~]$ hdfs zkfc -formatZK
+  hdfs zkfc -formatZK
   ```
 
 + 启动HA集群
 
   ```shell
-  [hadoop@master ~]$ start-dfs.sh
-  [hadoop@master ~]$ start-yarn.sh
+  start-dfs.sh
+  start-yarn.sh
   ```
 
-+ 手动启动[slave1]上的[resourcemanager]
-
-  ```shell
-  [hadoop@slave1 ~]$ yarn-daemon.sh start resourcemanager
-  ```
 
 ###### 5. 测试HA集群自动容灾
 
@@ -477,37 +502,9 @@
 
 ##### 6. Yarn历史服务器
 
-【yarn】历史服务器配置属性：
-
-- mapred-site.xml
-
-  ```xml
-  <property>
-      <name>mapreduce.jobhistory.address</name>
-      <value>master:10020</value>
-  </property>
-  <property>
-      <name>mapreduce.jobhistory.weapp.address</name>
-      <value>master:19888</value>
-  </property>
-  ```
-
-- yarn-site.xml
-
-  ```xml
-  <property>
-      <name>yarn.log-aggregation-enable</name>
-      <value>true</value>
-  </property>
-  <property>
-  	<name>yarn.log.server.url</name>
-      <value>http://master:19888/jobhistory/logs</value>
-  </property>
-  ```
-
-上述配置都已经配合了【yarn】历史服务器的相关配置，如果需要启动可以使用：
+【yarn】历史服务器配置属性已包含在上述内容，如果需要启动可以使用：
 
 ```shell
-[hadoop@master ~]$ mr-jobhistory-daemon.sh start historyserver
+mapred --daemon start historyserver
 ```
 

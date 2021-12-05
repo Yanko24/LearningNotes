@@ -4,23 +4,23 @@
 
 准备好已经安装了Hadoop的集群服务器之后，需要在其中一台中安装MySQL数据库，安装可以参考[CentOS7安装MySQL5.7](https://github.com/yangqi199808/BigData-Home/blob/master/CentOS/1.CentOS7安装MySQL5.7.md)这篇文章。
 
-下载Hive的安装包并上传至其中一台服务器中。
+下载Hive的安装包并上传至其中一台服务器中，[下载地址](https://downloads.apache.org/hive/)
 
 ##### 2. Hive本地安装
 
 ###### 1. 安装目录规划
 
 ```
-统一安装路径：/opt/apps
+统一安装路径：/opt/modules
 统一软件存放路径：/opt/software
 ```
 
 ###### 2. 上传压缩包
 
 ```
-1. 将压缩包上传到[/opt/software]目录下，解压到[/opt/apps]目录下
+1. 将压缩包上传到[/opt/software]目录下，解压到[/opt/modules]目录下
 2. 修改[/home/hadoop/.bash_profile]文件，增加以下内容：
-	HIVE_HOME=/opt/apps/hive-2.3.7
+	HIVE_HOME=/opt/modules/hive
 	PATH=$HIVE_HOME/bin:$PATH
 	export HIVE_HOME PATH
 3. 使用[source ~/.bash_profile]使其生效
@@ -29,21 +29,21 @@
 ###### 3. 上传MySQL的JAR包
 
 ```
-将mysql的jar包上传至/opt/apps/hive-2.3.7/lib目录下(注意和自己的mysql相匹配，如果使用mysql8，记得上传mysql8的jar包)
+将mysql的jar包上传至/opt/modules/hive/lib目录下(注意和自己的mysql相匹配，如果使用mysql8，记得上传mysql8的jar包)
 ```
 
 ###### 4. Hive配置
 
-配置文件目录：【/opt/apps/hive-2.3.7/conf/】
+配置文件目录：【/opt/modules/hive/conf/】
 
 - hive-env.sh
 
   需要将`hive-env.sh.template`复制一份为`hive-env.sh`
 
   ```
-  修改第48行HADOOP_HOME的路径为[/opt/apps/hadoop-2.7.7]
-  修改第51行HIVE_CONF_DIR的路径为[/opt/apps/hive-2.3.7/conf]
-  修改第54行HIVE_AUX_JARS_PATH的路径为[/opt/apps/hive-2.3.7/lib]
+  修改第48行HADOOP_HOME的路径为[/opt/modules/hadoop]
+  修改第51行HIVE_CONF_DIR的路径为[/opt/modules/hive/conf]
+  修改第54行HIVE_AUX_JARS_PATH的路径为[/opt/modules/hive/lib]
   ```
 
 - hive-site.sh
@@ -53,8 +53,23 @@
   ```xml
   <configuration>
       <property>
+          <!-- 查询数据时 显示出列的名字 -->
+          <name>hive.cli.print.header</name>
+          <value>true</value>
+      </property>
+      <property>
+          <!-- 在命令行中显示当前所使用的数据库 -->
+          <name>hive.cli.print.current.db</name>
+          <value>true</value>
+      </property>
+      <property>
+          <!-- 默认数据仓库存储的位置，该位置为HDFS上的路径 -->
+          <name>hive.metastore.warehouse.dir</name>
+          <value>/user/hive/warehouse</value>
+      </property>
+      <property>
       	<name>javax.jdo.option.ConnectionURL</name>
-        <value>jdbc:mysql://master:3306/hive?createDatabaseIfNotExist=true&amp;characterEncoding=latin1</value>
+        <value>jdbc:mysql://hadoop01:3306/hive?createDatabaseIfNotExist=true</value>
       </property>
       <property>
       	<name>javax.jdo.option.ConnectionDriverName</name>
@@ -62,7 +77,7 @@
       </property>
       <property>
       	<name>javax.jdo.option.ConnectionUserName</name>
-          <value>yangqi</value>
+          <value>hive</value>
       </property>
       <property>
       	<name>javax.jdo.option.ConnectionPassword</name>
@@ -92,35 +107,31 @@ hive> show databases;
 
 Hive远程安装是指需要手动维护一个metastore服务或者hiveserver2服务，之后可以在任何一个客户端机器上访问该服务，连接Hive。
 
-###### 1. Hive服务端配置
+###### 1. HiveServer2服务的配置
 
 - hive-site.xml
 
   ```xml
   <configuration>
       <property>
-      	<name>hive.metastore.warehouse.dir</name>
-      	<value>/user/hive/warehouse</value>
+          <name>hive.server2.transport.mode</name>
+          <value>binary</value>
       </property>
       <property>
-      	<name>javax.jdo.option.ConnectionURL</name>
-          <value>jdbc:mysql://master:3306/hive?createDatabaseIfNotExist=true&amp;characterEncoding=latin1</value>
+          <name>hive.server2.thrift.port</name>
+          <value>10000</value>
       </property>
       <property>
-      	<name>javax.jdo.option.ConnectionDriverName</name>
-          <value>com.mysql.jdbc.Driver</value>
+          <name>hive.server2.webui.host</name>
+          <value>hadoop01</value>
       </property>
       <property>
-      	<name>javax.jdo.option.ConnectionUserName</name>
-          <value>yangqi</value>
-      </property>
-      <property>
-      	<name>javax.jdo.option.ConnectionPassword</name>
-          <value>xiaoer</value>
+          <name>hive.server2.webui.port</name>
+          <value>10002</value>
       </property>
   </configuration>
   ```
-
+  
 - hive服务
 
   ```shell
@@ -138,7 +149,7 @@ Hive远程安装是指需要手动维护一个metastore服务或者hiveserver2�
 
 ###### 2. hive客户端配置
 
-将下载好的Hive安装包解压到[/opt/apps]目录下，并配置环境变量即可，修改hive-env.sh的相关路径即可。
+将下载好的Hive安装包解压到[/opt/modules]目录下，并配置环境变量即可，修改hive-env.sh的相关路径即可。
 
 如果服务端启动的是hiveserver2服务，那么客户端不需要进行过多的配置，可以使用beeline工具连接。
 
@@ -212,3 +223,4 @@ Error: Could not open client transport with JDBC Uri: jdbc:hive2://slave2:10000/
   ```
 
 可以在客户端直接使用hive连接远程的metastore服务，操作hive数据库。
+
