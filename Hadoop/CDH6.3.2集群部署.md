@@ -102,8 +102,6 @@ cp /opt/software/CDH6.3.2/cm6.3.1/RPMS/x86_64/* /var/www/html/cm6
 cp /opt/software/CDH6.3.2/allkeys.asc /var/www/html/cm6
 cp /opt/software/CDH6.3.2/CDH-6.3.2-1.cdh6.3.2.p0.1605554-el7.parcel /var/www/html/cdh6
 cp /opt/software/CDH6.3.2/manifest.json /var/www/html/cdh6
-# flink包
-cp -r /opt/software/CDH6.3.2/flink/ /var/www/html/cdh6/
 ```
 
 安装createrepo：
@@ -212,14 +210,25 @@ echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
 Tips：修改完成后需要重启
 
-###### 7. 启动cloudera-manager（cdh1）
+###### 7. 初始化MySQL数据库
+
+```shell
+# /usr/share/java目录可能不存在，需要新建
+cp /opt/software/mysql-5.7/mysql-connector-java.jar /usr/share/java/
+
+# 初始化mysql数据库
+# 脚本参数：数据库类型 数据库名称 数据库用户
+/opt/cloudera/cm/schema/scm_prepare_database.sh mysql cmf cmf
+```
+
+###### 8. 启动cloudera-manager（cdh1）
 
 ```shell
 systemctl start cloudera-scm-server
 systemctl status cloudera-scm-server
 ```
 
-###### 8. 访问cloudera-manager并访问
+###### 9. 访问cloudera-manager并访问
 
 ```shell
 端口：7180 用户名：admin 密码：admin
@@ -239,7 +248,11 @@ systemctl status cloudera-scm-server
 AddType application/x-gzip .gz .tgz .parcel #此处添加.parcel
 ```
 
-将FLINK_ON_YARN-1.13.3.jar放在cm server节点的/opt/cloudera/csd目录下。
+将FLINK_ON_YARN-1.13.3.jar放在cm server节点的/opt/cloudera/csd目录下，并修改jar包的用户和用户组：
+
+```shell
+sudo chown -R cloudera-scm:cloudera-scm /opt/cloudera/csd/
+```
 
 ###### 3. 重启agent及cm server
 
@@ -254,12 +267,34 @@ systemctl restart cloudera-scm-agent
 
 ![](images/kerberos-flink.jpg)
 
+###### 4 报错如下内容
+
+```
+Exception in thread "main" java.lang.NoClassDefFoundError: org/apache/hadoop/yarn/exceptions/YarnException
+    at java.lang.Class.getDeclaredMethods0(Native Method)
+    at java.lang.Class.privateGetDeclaredMethods(Class.java:2701)
+    at java.lang.Class.privateGetMethodRecursive(Class.java:3048)
+    at java.lang.Class.getMethod0(Class.java:3018)
+    at java.lang.Class.getMethod(Class.java:1784)
+    at sun.launcher.LauncherHelper.validateMainClass(LauncherHelper.java:544)
+    at sun.launcher.LauncherHelper.checkAndLoadMain(LauncherHelper.java:526)
+Caused by: java.lang.ClassNotFoundException: org.apache.hadoop.yarn.exceptions.YarnException
+    at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+    at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+    at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+    at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+    ... 7 more
+```
+
+```shell
+# 复制flink-shaded-hadoop到flink的lib下
+cp /opt/software/CDH6.3.2/flink-shaded-hadoop-3-uber-3.1.1.7.2.9.0-173-9.0.jar /opt/cloudera/parcels/FLINK/lib/flink/lib`
+```
+
 ###### 5. 复制jar包到flink的lib下（所有节点）
 
 ```shell
-# flink-shaded-hadoop-3-uber-3.1.1.7.2.9.0-173-9.0.jar 和 common-cli-1.4.jar
 # 复制jar包到/opt/cloudera/parcels/FLINK/lib/flink/lib目录下
-cp /opt/software/CDH6.3.2/flink-shaded-hadoop-3-uber-3.1.1.7.2.9.0-173-9.0.jar /opt/cloudera/parcels/FLINK/lib/flink/lib
 cp /opt/software/CDH6.3.2/common-cli-1.4.jar /opt/cloudera/parcels/FLINK/lib/flink/lib
 ```
 

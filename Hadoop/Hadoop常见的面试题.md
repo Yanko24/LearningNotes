@@ -222,3 +222,59 @@ YARN的基本设计思想是将MapReduce V1中的JobTracker拆分为两个独立
 **Capacity Scheduler**（能力调度器）：对于Capacity Scheduler调度器，有一个专门的队列用来运行小任务，但是为小任务专门设置一个队列会预先占用一定的集群资源，这就导致大任务的执行时间会落后于使用FIFO Scheduler调度器的时间。
 
 **Fair Scheduler**（公平调度器）：在Fair Scheduler调度器中，我们不需要预先占用一定的系统资源，Fair调度器会为所有运行的job动态的调整系统资源。比如：当第一个大的job提交时，只有这一个job在运行，此时它获得了所有集群资源，当第二个小任务提交后，Fair调度器会分配一半资源给这个小任务，让两个任务公平的共享集群资源。需要注意的是，在Fair调度器中，从第二个任务提交到获取资源会有一定的延迟，因为它需要等待第一个任务释放占用的Container。小任务执行完成之后也会释放自己占用的资源，大任务又获得了全部的系统资源。最终的效果就是Fair调度器即得到了高的资源利用率又能保证小任务及时完成。
+
+##### 19. Hadoop的优化
+
+###### 1. HDFS小文件的影响
+
+- 影响NameNode的寿命，因为文件元数据存储在NameNode的内存中。
+- 影响计算引擎的任务数量，每个小文件都会生成一个Map任务。
+
+###### 2. 数据输入小文件处理
+
+- 合并小文件：对小文件进行归档（Har）、自定义Inputformat将小文件存储成SequenceFile文件。
+- 采用ConbinFileInputFormat来作为输入，解决输入端大量小文件场景，对于大量的小文件Job，也可以开启JVM重用。
+
+###### 3. Map阶段
+
+- 增大环形缓冲区大小，由100M扩大到200M。
+- 增加环形缓冲区溢写的比例，由80%扩大到90%。
+
+- 减少对溢写文件的merge次数，10个文件，一次20个merge。
+- 不影响实际业务的前提下，采用Combiner提前合并，减少I/O。
+
+###### 4. Reduce阶段
+
+- 合理设置Map和Reduce个数：两个都不能太少，也不能太多。太少，会导致Task等待，延长处理事件；太多，会导致Map、Reduce任务间竞争资源，造成处理超时等错误。设置Map、Reduce共存：调整slowstart.completedmaps参数，使Map运行到一定程度后，Reduce也开始运行，减少Reduce的等待时间。
+- 规避使用Reduce，因为Reduce在用于连接数据集的时候会产生大量的网络消耗。
+
+- 增加每个Reduce去Map中拿数据的并行数。
+- 集群性能可以的前提下，增加Reduce端存储数据内存的大小。
+
+###### 5. IO传输
+
+- 采用数据压缩的方式，减少网络IO的时间。
+- 使用SequenceFile二进制文件。
+
+###### 6. 整体
+
+- MapTask默认内存大小为1G，可以增加MapTask内存大小为4
+- ReduceTask默认内存大小为1G，可以增加ReduceTask内存大小为4-5g
+
+- 可以增加MapTask的cpu核数，增加ReduceTask的CPU核数
+- 增加每个Container的CPU核数和内存大小
+
+- 调整每个Map Task和Reduce Task最大重试次数
+
+##### 20. 如何解决Hadoop的数据倾斜
+
+###### 1. 提前在map进行combine，减少输出的数据量
+
+在Mapper加上combiner相当于提前进行reduce，即把一个Mapper中的相同的key进行了聚合，减少shuffle过程中传输的数据量，以及Reducer端的计算量。
+
+###### 2. 数据倾斜的key，大量分布在不同的mapper
+
+- 局部聚合+全局聚合：第一次在map阶段对那些导致了倾斜的key加上1-n的随机前缀，这样本来相同的key，也会被分到多个Reduce中进行局部聚合，数量就会大大降低。第二次mapreduce，去掉key的随机前缀，进行全局聚合。
+- 增加Reducer，提升并行度：JobConf.setNumReduceTasks(int)。
+
+- 实现自定义分区：根据数据分布情况，自定义散列函数，将key均匀分配到不同的Reducer。

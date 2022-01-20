@@ -28,7 +28,7 @@ Flink是为分布式、高性能、随时可用以及准确的流处理应用程
 
 ###### 3. 分层API
 
-![](http://typora-image.test.upcdn.net/images/Flink%20API.jpg)
+![](images/Flink API.jpg)
 
 ##### 3. Flink和Spark
 

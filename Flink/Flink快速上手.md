@@ -111,7 +111,7 @@ object Flink02_WordCount_Bounded_Scala {
 }
 ```
 
-##### 3. 无界流处理WordCount
+##### 4. 无界流处理WordCount
 
 ```scala
 object Flink03_WordCount_UnBounded_Scala {

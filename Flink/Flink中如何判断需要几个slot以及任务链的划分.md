@@ -1,4 +1,4 @@
-#### Flink中如何判断需要几个slot以及任务链的划分
+#### Flink中判断需要几个slot以及任务链的划分
 
 ##### 1. 设置全局的并发
 
@@ -161,7 +161,7 @@ object Flink01_WordCount_Chain_Scala {
 通过`startNewChain`或者`disableOperatorChaining`可以让某一个算子开启一个新的任务链或禁用任务链，也可以实现切分任务链。
 
 ```scala
-bject Flink01_WordCount_Chain_Scala {
+object Flink01_WordCount_Chain_Scala {
   def main(args: Array[String]): Unit = {
     // 1.创建执行环境
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
