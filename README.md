@@ -131,13 +131,11 @@
 
 2.[Flink快速上手](Flink/Flink快速上手.md)
 
-3.[Flink运行环境_Local](Flink/Flink运行环境_Local.md)
+3.[Flink运行环境](Flink/Flink运行环境.md)
 
-4.[Flink运行环境_Standalone](Flink/Flink运行环境_Standalone.md)
+4.[Flink的运行架构](Flink/Flink的运行架构.md)
 
-5.[Flink运行环境_Yarn](Flink/Flink运行环境_Yarn.md)
-
-6.[Flink中如何判断需要几个slot以及任务链的划分](Flink/Flink中如何判断需要几个slot以及任务链的划分.md)
+5.[Flink中判断需要几个slot以及任务链的划分](Flink/Flink中判断需要几个slot以及任务链的划分.md)
 
 #### 六、HBase
 
