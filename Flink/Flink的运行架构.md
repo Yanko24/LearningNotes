@@ -28,7 +28,7 @@ JobManager会把JobGraph转换成一个物理层面的数据流图—执行图�
 
 - Dispatcher
 
-  负责接收用户提供的作业，并且负责为这个新提交的作业启动一个新的JobManager组件。Dispatcher也会启动一个Web  UI，用来方便地展示和监控作业执行的信息，Dispatcher在架构中坑并不是必需的，这取决于应用提交运行的方式。
+  负责接收用户提供的作业，并且负责为这个新提交的作业启动一个新的JobManager组件。Dispatcher也会启动一个Web  UI，用来方便地展示和监控作业执行的信息，Dispatcher在架构中可能并不是必需的，这取决于应用提交运行的方式。
 
 - JobMaster
 
