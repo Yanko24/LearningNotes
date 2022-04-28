@@ -1,10 +1,10 @@
-#### SparkSQL概述
+### SparkSQL概述
 
-##### 1. SparkSQL是什么
+#### 1. SparkSQL是什么
 
 SparkSQL是Spark用于结构化数据（structured data）处理的Spark模块。
 
-##### 2. SparkSQL的发展
+#### 2. SparkSQL的发展
 
 - 数据兼容方面：SparkSQL不但兼容Hive，还可以从RDD、parquet文件、JSON文件中获取数据，未来版甚至支持获取RDBMS数据以及cassandra等NOSQL数据
 - 性能优化方面：出来才去In-Memory Columnar Storage、byte-code generation等优化技术外、将会引进Cost Model对查询进行动态评估、获取最佳物理计划等等
@@ -16,25 +16,25 @@ SparkSQL是Spark用于结构化数据（structured data）处理的Spark模块�
 
 SparkSQL为了简化RDD的开发，提高开发效率，提供了2个编程抽象，类似于Spark Core中的RDD：DataFrame和DataSet。
 
-##### 3. SparkSQL特点
+#### 3. SparkSQL特点
 
-###### 1. 易整合
+##### 1. 易整合
 
 无缝的整合了SQL查询和Spark编程。
 
-###### 2. 统一的数据访问
+##### 2. 统一的数据访问
 
 使用相同的方式连接不同的数据源。
 
-###### 3. 兼容Hive
+##### 3. 兼容Hive
 
 在已有仓库上直接运行SQL或者HiveSQL。
 
-###### 4. 标准数据连接
+##### 4. 标准数据连接
 
 通过JDBC或者ODBC来连接。
 
-##### 4. DataFrame
+#### 4. DataFrame
 
 DataFrame是一种以RDD为基础的分布式数据集，类似于传统数据库中的二维表格。DataFrame与RDD的主要区别在于，前者带有schema元信息，即DataFrame所表示的二维表数据集的每一列都带有名称和类型。这使得Spark SQL得以洞察更多的数据信息，从而对藏于DataFrame背后的数据源以及作用于DataFrame之上的变换进行了针对性的优化，最终达到大幅提升运行时效率的目标。由于RDD无从得知锁存数据元素的具体内部结构，Spark Core只能在stage层面进行简单、通用的流水线优化。
 
@@ -44,7 +44,7 @@ DataFrame是为数据提供了Schema的视图，可以直接当做数据库中�
 
 逻辑查询计划优化就是一个利用基于关系代数的等价变换，将高成本的操作替换为低成本操作的过程。
 
-##### 5. DataSet
+#### 5. DataSet
 
 DataSet是分布式数据集合。DataSet是Spark 1.6中添加的一个新抽象，是DataFrame的一个扩展。它提供了RDD的优化（强类型，使用强大的lambda函数的能力）以及SparkSQL优化执行引擎的优化。DataSet也可以使用功能性的转换（操作map，flatMap，filter等等）。
 

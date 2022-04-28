@@ -1,6 +1,6 @@
-#### SparkSQL核心编程
+### SparkSQL核心编程
 
-##### 1. 构建SparkSQL环境
+#### 1. 构建SparkSQL环境
 
 在老的版本中，SparkSQL提供了两种SQL查询起始点：一个SQLContext，用于Spark自己提供的SQL查询；一个HiveContext，用于连接Hive的查询。
 
@@ -8,11 +8,11 @@ SparkSession是Spark最新的SQL查询起始点，实际上是SQLContext和HiveC
 
 ![](http://typora-image.test.upcdn.net/images/Spark-shell-sparksession.jpg)
 
-##### 2. DataFrame
+#### 2. DataFrame
 
 SparkSQL的DataFrame API允许我们使用DataFrame而不用必须去注册临时表或者生成SQL表达式。DataFrame API既有transformation操作也有action操作。
 
-###### 1. 创建DataFrame
+##### 1. 创建DataFrame
 
 在SparkSQL中SparkSession是创建DataFrame和执行SQL的入口，创建DataFrame有三种方式：通过Spark的数据源进行创建；从一个存在的RDD进行转换；还可以从Hive Table进行查询返回。
 
@@ -30,7 +30,7 @@ SparkSQL的DataFrame API允许我们使用DataFrame而不用必须去注册临�
 
 - 从HiveTable进行查询返回
 
-###### 2. SQL语法
+##### 2. SQL语法
 
 SQL语法风格是指我们在查询数据的时候使用SQL语法来查询，这种风格的查询必须要有临时视图或者全局视图来辅助。
 
@@ -58,7 +58,7 @@ SQL语法风格是指我们在查询数据的时候使用SQL语法来查询，�
 
   ![](http://typora-image.test.upcdn.net/images/SparkSQL查询全局临时表数据.jpg)
 
-###### 3. DSL语法
+##### 3. DSL语法
 
 DataFrame提供一个特定领域语言（domain-specific language，DSL）去管理结构化的数据。可以在Scala，Java，Python和R中使用DSL，使用DSL语法风格不必去创建临时视图了。
 
@@ -86,17 +86,17 @@ DataFrame提供一个特定领域语言（domain-specific language，DSL）去�
 
   ![](http://typora-image.test.upcdn.net/images/SparkSQL-DSL分组求个数.jpg)
 
-###### 4. RDD转换为DataFrame
+##### 4. RDD转换为DataFrame
 
 在IDEA中开发程序时，如果需要RDD与DF或者DS之间互相操作，那么需要引入`import spark.implicits._`
 
 ![](http://typora-image.test.upcdn.net/images/SparkSQL-RDD-DF.jpg)
 
-##### 3. DataSet
+#### 3. DataSet
 
 DataSet是具有强类型的数据集合，需要提供对应的类型信息。
 
-###### 1. 创建DataSet
+##### 1. 创建DataSet
 
 - 使用样例类序列创建DataSet
 
@@ -106,29 +106,29 @@ DataSet是具有强类型的数据集合，需要提供对应的类型信息。
 
   ![](http://typora-image.test.upcdn.net/images/SparkSQL-DataSet-基本序列.jpg)
 
-###### 2. RDD转换为DataSet
+##### 2. RDD转换为DataSet
 
 ![](http://typora-image.test.upcdn.net/images/SparkSQL-RDD-DataSet.jpg)
 
-###### 3. DataSet转换为RDD
+##### 3. DataSet转换为RDD
 
 ![](http://typora-image.test.upcdn.net/images/SparkSQL-DataSet-RDD.jpg)
 
-##### 4. DataFrame和DateSet转换
+#### 4. DataFrame和DateSet转换
 
 DataFrame其实是DataSet的特例，所以它们之间是可以相互转换的。
 
-###### 1. DataFrame转换为DataSet
+##### 1. DataFrame转换为DataSet
 
 ![](http://typora-image.test.upcdn.net/images/SparkSQL-DataFrame-DataSet.jpg)
 
-###### 2. DataSet转换为DataFrame
+##### 2. DataSet转换为DataFrame
 
 ![](http://typora-image.test.upcdn.net/images/SparkSQL-DataSet-DataFrame.jpg)
 
-##### 5. RDD、DataFrame、DataSet三者的关系
+#### 5. RDD、DataFrame、DataSet三者的关系
 
-###### 1. 三者的共性
+##### 1. 三者的共性
 
 - RDD、DataFrame、DataSet全都是spark平台下的分布式弹性数据集，为处理超大型数据提供便利
 - 三者都有惰性机制，在进行创建、转换，如map方法时，不会立即执行，只有在遇到Action和foreach时，三者才会开始遍历运算
@@ -138,7 +138,7 @@ DataFrame其实是DataSet的特例，所以它们之间是可以相互转换的�
 - 三者都有partition的概念
 - DataFrame和DataSet均可以使用模式匹配获取各个字段的值和类型
 
-###### 2. 三者的区别
+##### 2. 三者的区别
 
 - RDD
   - RDD一般和spark mllib同时使用
@@ -152,11 +152,11 @@ DataFrame其实是DataSet的特例，所以它们之间是可以相互转换的�
   - DataSet和DataFrame拥有完全相同的成员函数，区别知识每一行的数据类型不同。DataFrame其实就是DataSet的一个特列：`type DataFrame = DataSet[Row]`
   - DataFrame也可以叫DataSet[Row]，每一行的类型都是Row，不解析，每一行究竟有那些字段，各个字段又是什么类型都无从得知，只能用getAs方法或者模式匹配拿出特定字段。而DataSet中，每一行是什么类型都是不一定的，在自定义了case class之后可以很自由的获取每一行的信息
 
-###### 3. 三者的互相转换
+##### 3. 三者的互相转换
 
 ![](http://typora-image.test.upcdn.net/images/SparkSQL.jpg)
 
-##### 6. IDEA开发SparkSQL
+#### 6. IDEA开发SparkSQL
 
 ```scala
 package com.yankee.spark.sql
@@ -222,11 +222,11 @@ object Spark01_SparkSQL_Basic {
 }
 ```
 
-##### 7. 用户自定义函数
+#### 7. 用户自定义函数
 
 用户可以通过spark.udf功能添加自定义函数，实现自定义功能。
 
-###### 1. UDF
+##### 1. UDF
 
 ```scala
 /**
@@ -258,7 +258,7 @@ object Spark02_SparkSQL_UDF {
 }
 ```
 
-###### 2. 弱类型的UDAF
+##### 2. 弱类型的UDAF
 
 ```scala
 import org.apache.spark.SparkConf
@@ -349,7 +349,7 @@ object Spark03_SparkSQL_UDAF {
 }
 ```
 
-###### 3. 强类型的UDAF
+##### 3. 强类型的UDAF
 
 - 高版本的实现方式
 
@@ -512,9 +512,9 @@ object Spark03_SparkSQL_UDAF {
   }
   ```
 
-##### 8. 数据的加载和保存
+#### 8. 数据的加载和保存
 
-###### 1. 通用的加载和保存方式
+##### 1. 通用的加载和保存方式
 
 SparkSQL提供了通用的保存数据和数据加载的方式。这里的通用是指使用相同的API，根据不同的参数读取和保存不同格式的数据，SparkSQL默认读取和保存的文件格式为parquet。
 
@@ -579,7 +579,7 @@ SparkSQL提供了通用的保存数据和数据加载的方式。这里的通用
   df.write.mode("append").json("/home/hadoop/user.json")
   ```
 
-###### 2. Parquet
+##### 2. Parquet
 
 SparkSQL的默认数据源为`Parquet`格式。`Parquet`是一种能够有效存储嵌套数据的列式存储格式。数据源为`Parquet`文件时，SparkSQL可以方便的执行所有的操作，不需要使用`format`，修改配置项`spark.sql.source.default`，可以修改数据源默认格式。
 
@@ -591,7 +591,7 @@ SparkSQL的默认数据源为`Parquet`格式。`Parquet`是一种能够有效存
 
   ![](http://typora-image.test.upcdn.net/images/parquetsave.jpg)
 
-###### 3. JSON
+##### 3. JSON
 
 SparkSQL能够通过自动推测JSON数据集的结构，并将它加载为一个`DataSet[Row]`，可以通过`SparkSession.read.json()`去加载JSON文件。
 
@@ -605,13 +605,13 @@ SparkSQL能够通过自动推测JSON数据集的结构，并将它加载为一�
 
   ![](http://typora-image.test.upcdn.net/images/jsonsave.jpg)
 
-###### 4. CSV
+##### 4. CSV
 
 SparkSQL可以配置CSV文件的列表信息，读取CSV文件，CSV文件的第一行设置为数据列。
 
 ![](http://typora-image.test.upcdn.net/images/csvload.jpg)
 
-###### 5. MySQL
+##### 5. MySQL
 
 ```scala
 import org.apache.spark.SparkConf
@@ -655,7 +655,7 @@ object Spark01_SpakSQL_JDBC {
 }
 ```
 
-###### 6. Hive
+##### 6. Hive
 
 如果需要在SparkSQL中包含Hive的库，并不需要事先安装Hive。如果要把SparkSQL连接到一个部署好的Hive上，你需要将`hive-site.xml`复制到Spark的conf目录下。
 

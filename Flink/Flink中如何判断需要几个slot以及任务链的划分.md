@@ -1,6 +1,6 @@
-#### Flink中判断需要几个slot以及任务链的划分
+### Flink中判断需要几个slot以及任务链的划分
 
-##### 1. 设置全局的并发
+#### 1. 设置全局的并发
 
 ```scala
 object Flink01_WordCount_Chain_Scala {
@@ -38,7 +38,7 @@ object Flink01_WordCount_Chain_Scala {
 
 ![](http://typora-image.test.upcdn.net/images/wordcount-1.png)
 
-##### 2. 给某个算子单独设置并发
+#### 2. 给某个算子单独设置并发
 
 ```scala
 object Flink01_WordCount_Chain_Scala {
@@ -78,7 +78,7 @@ object Flink01_WordCount_Chain_Scala {
 
 <font color='blue'>注意：也就是说任务链的划分和是否进行keyBy等shuffle操作有关，如果在并行度一致的情况下，只要进行了keyBy等shuffle操作，就会划分任务链。如果对于并行度不同的情况下，发生并行度改变时也会增加任务链个数。对于Slot而言，由于所有的任务都在同一个共享组中，所以说Slot的个数等于并行度最大的算子所使用的Slot。</font>
 
-##### 3. 设置不同的共享组
+#### 3. 设置不同的共享组
 
 ```scala
 object Flink01_WordCount_Chain_Scala {
@@ -116,7 +116,7 @@ object Flink01_WordCount_Chain_Scala {
 
 ![](http://typora-image.test.upcdn.net/images/wordcount-3.png)
 
-##### 4. 设置不同的共享组，组内设置并行度
+#### 4. 设置不同的共享组，组内设置并行度
 
 ```scala
 object Flink01_WordCount_Chain_Scala {
@@ -156,7 +156,7 @@ object Flink01_WordCount_Chain_Scala {
 
 <font color='blue'>总结：从以上的示例可以看出，</font><font color='red'>slot的任务等于共享组内最大并行度之和。任务链的切分和是否进行shuffle等操作以及并行度一致有关。并行度不一致切分任务链，进行keyBy等shuffle操作也会切分任务链。</font>
 
-##### 5. 其它方式切分任务链
+#### 5. 其它方式切分任务链
 
 通过`startNewChain`或者`disableOperatorChaining`可以让某一个算子开启一个新的任务链或禁用任务链，也可以实现切分任务链。
 

@@ -1,4 +1,4 @@
-#### FlinkStream常用算子
+### FlinkStream常用算子
 
 其实对于所有的计算框架都是一样的，都分为以下四部分：
 
@@ -8,7 +8,7 @@ Flink中提供的一些Source、Transform算子以及Sink如下：
 
 ![](images/flink流处理.jpg)
 
-##### 1. Environment
+#### 1. Environment
 
 Flink Job提交执行计算时，首先需要简历和Flink框架的联系，所以只有获取处理的环境，才能将task调度到不同的taskManager执行。
 
@@ -20,7 +20,7 @@ ExecutionEnvironment benv = ExecutionEnvironment.getExecutionEnvironment();
 StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 ```
 
-获取执行环境之后，有很多参数都是可选的，除过以下的一些简单参数，还有很多参数，可以参考[官网](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/dev/datastream/fault-tolerance/checkpointing/)
+获取执行环境之后，有很多参数都是可选的，除过以下的一些简单参数，还有很多参数，可以参考[官网](https://nightlies.apache.org/flink/flink-docs-release-1.13/docs/dev/datastream/fault-tolerance/checkpointing/)
 
 ```java
 // 设置并行度
@@ -31,11 +31,11 @@ env.enableCheckpointing(6000, CheckpointingMode.EXACTLY_ONCE);
 env.setStateBackend(new FsStateBackend("hdfs://supercluster/flink/checkpoints"));
 ```
 
-##### 2. Source
+#### 2. Source
 
 Flink框架可以从不同来源获取数据，将数据交给框架进行处理，将获取数据的来源称之为数据源，常见的数据源大致分为以下几种：
 
-###### 1. 从集合中获取数据
+##### 1. 从集合中获取数据
 
 ```java
 List<Student> students = Arrays.asList(new Student("1324", "alice", 14),
@@ -44,7 +44,7 @@ List<Student> students = Arrays.asList(new Student("1324", "alice", 14),
 DataStreamSource<Student> studentDS = env.fromCollection(students);
 ```
 
-###### 2. 从文件中读取数据
+##### 2. 从文件中读取数据
 
 - 参数可以是目录也可以是文件
 - 路径可以是相对路径也可以是绝对路径
@@ -62,13 +62,13 @@ SingleOutputStreamOperator<Student> mapDS = studentDS.map(value -> {
 });
 ```
 
-###### 3. 从Socket读取数据
+##### 3. 从Socket读取数据
 
 ```java
 DataStreamSource<String> socketDS = env.socketTextStream("localhost", 9999);
 ```
 
-###### 4. 从kafka中获取数据
+##### 4. 从kafka中获取数据
 
 - Flink框架提供了很多的connector连接器，在使用时需要导入对应的包
 
@@ -81,7 +81,7 @@ DataStreamSource<String> kafkaDS = env.addSource(new FlinkKafkaConsumer<String>(
     new SimpleStringSchema(), properties));
 ```
 
-###### 5. 自定义source
+##### 5. 自定义source
 
 - 自定义source需要实现`SourceFunction`接口
 
@@ -140,9 +140,9 @@ public static class MySource implements SourceFunction<Student> {
 }
 ```
 
-##### 3. Transform
+#### 3. Transform
 
-###### 1. map
+##### 1. map
 
 - 作用：将数据流中的数据进行转换，形成新的数据流，消费一个元素并产出一个元素
 - 参数：`lambda`表达式或`MapFunction`或`RichMapFunction`的实现类
@@ -190,7 +190,7 @@ public class Flink09_Transform_RichMap {
 }
 ```
 
-###### 2. flatMap
+##### 2. flatMap
 
 - 作用：消费一个元素并产生零个或多个元素
 - 参数：`FlatMapFunction`或`RichFlatMapFunction`实现类
@@ -208,7 +208,7 @@ SingleOutputStreamOperator<String> flatMapDS = socketDS.flatMap(new FlatMapFunct
 });
 ```
 
-###### 3. filter
+##### 3. filter
 
 - 作用：根据指定的规则将满足条件的数据保留，不满足条件的数据丢弃
 - 参数：`FilterFunction`或`RichFilterFunction`的实现类
@@ -234,7 +234,7 @@ SingleOutputStreamOperator<String> filterDS = textFile.filter(new RichFilterFunc
 });
 ```
 
-###### 4. keyBy
+##### 4. keyBy
 
 - 作用：把流中的数据分到不同的分区中，具有相同key的元素会分到同一个分区中，一个分区中可以有多重不同的key，在内部时使用hash分区来实现的
 - 参数：`KeySelector<IN, KEY>`的实现类
@@ -246,7 +246,7 @@ SingleOutputStreamOperator<String> filterDS = textFile.filter(new RichFilterFunc
 studentDs.keyBy(student -> student.getAge())
 ```
 
-###### 5. shuffle
+##### 5. shuffle
 
 - 作用：把流中的元素随机打乱，对同一个组的数据，每次得到的结果都不相同
 - 参数：无
@@ -256,7 +256,7 @@ studentDs.keyBy(student -> student.getAge())
 studentDS.shuffle()
 ```
 
-###### 6. rebalance
+##### 6. rebalance
 
 - 作用：将数据随机打乱写入下游分区，随机第一个分区，之后开始轮询。如果上游是8个分区，下游4个分区，会将8个分区的数据随机写入下游4个分区
 - 参数：无
@@ -266,7 +266,7 @@ studentDS.shuffle()
 studentDS.rebalance()
 ```
 
-###### 7. rescale
+##### 7. rescale
 
 - 作用：将数据随机打乱写入下游分区，随机第一个分区，之后开始轮询。如果上游是8个分区，下游4个分区，会根据情况将前4个分区的数据写入下游其中2个分区，剩下4个分区的数据写入其他两个分区
 - 参数：无
@@ -276,7 +276,7 @@ studentDS.rebalance()
 studentDS.rescale()
 ```
 
-###### 8. glocal
+##### 8. glocal
 
 - 作用：将所有数据统一写入一个分区
 - 参数：无
@@ -286,7 +286,7 @@ studentDS.rescale()
 studentDS.global()
 ```
 
-###### 9. forward
+##### 9. forward
 
 - 作用：上下游并行度相同时使用，分区一一对应，如果上下游分区不同则会报错
 - 参数：无
@@ -296,7 +296,7 @@ studentDS.global()
 studentDS.forward()
 ```
 
-###### 10. 简单滚动聚合算子
+##### 10. 简单滚动聚合算子
 
 - 包含`sum`、`min`、`max`、`minBy`和`maxBy`等聚合算子
 
@@ -308,7 +308,7 @@ studentDS.forward()
 SingleOutputStreamOperator<Student> maxStream = keyedStream.max("age");
 ```
 
-###### 11. connect
+##### 11. connect
 
 - 作用：将两个不同来源的流进行连接，实现数据匹配。Flink中的connect算子可以连接两个保持它们类型的数据流，两个数据流被connect之后，只是被放在了同一个流中，内部依然保持各自的数据和形式不发生任何变化，两个流相互独立
 - 参数：另外一个流
@@ -323,7 +323,7 @@ cs.getFirstInput().print("first");
 cs.getSecondInput().print("second");
 ```
 
-###### 12. union
+##### 12. union
 
 - 作用：对两个或两个以上的DataStream进行union操作，产生一个包含所有DataStream元素的新DataStream
 - 参数：另外的流
@@ -341,9 +341,9 @@ stream1
     .print();
 ```
 
-##### 4. Sink
+#### 4. Sink
 
-###### 1. KafkaSink
+##### 1. KafkaSink
 
 ```java
 Properties properties = new Properties();
@@ -357,7 +357,7 @@ studentDS.map(new MapFunction<Student, String>() {
 }).addSink(new FlinkKafkaProducer<String>("test", new SimpleStringSchema(), properties));
 ```
 
-###### 2. RedisSink
+##### 2. RedisSink
 
 ```java
 FlinkJedisPoolConfig jedisPoolConfig = new FlinkJedisPoolConfig.Builder()
@@ -383,7 +383,7 @@ studentDS.addSink(new RedisSink<>(jedisPoolConfig, new RedisMapper<Student>() {
 }));
 ```
 
-###### 3. ElasticSearchSink
+##### 3. ElasticSearchSink
 
 ```java
 ArrayList<HttpHost> httpHosts = new ArrayList<>();
@@ -415,7 +415,7 @@ ElasticsearchSink<Student> elasticsearchSink = studentBuilder.build();
 studentDS.addSink(elasticsearchSink);
 ```
 
-###### 4. 自定义sink
+##### 4. 自定义sink
 
 - 自定义sink需要实现`RichSinkFunction`接口
 
@@ -456,7 +456,7 @@ sensorDS.addSink(new RichSinkFunction<Student>() {
 });
 ```
 
-##### 5. 执行模式
+#### 5. 执行模式
 
 Flink引入了三种模式，分别是：`STREAMING(默认)`、`BATCH`和`AUTOMATIC`。`STREAMING`是流处理模式，即所谓的无界流，当然也可以用来处理有界流，对于数据是来一条处理一条。`BATCH`是批处理模式，可以用来处理有界流数据，对于数据处理完之后，一次性输出结果。`AUTOMATIC`是自动根据Source进行设置`STREAMING`还是`BATCH`。
 

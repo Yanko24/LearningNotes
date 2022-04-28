@@ -1,8 +1,8 @@
-#### SparkStreaming核心编程
+### SparkStreaming核心编程
 
-##### 1. DStream入门
+#### 1. DStream入门
 
-###### 1. WordCount实例
+##### 1. WordCount实例
 
 ```scala
 import org.apache.spark.SparkConf
@@ -42,7 +42,7 @@ object SparkStreaming01_WordCount {
 }
 ```
 
-###### 2. WordCount解析
+##### 2. WordCount解析
 
 Discretized Stream是Spark Streaming的基础抽象，代表持续性额数据流和经过各种Spark原语操作后的结果数据流。在内部实现上，DStream是一系列连续的RDD来表示。每个RDD含有一段时间间隔内的数据。
 
@@ -56,9 +56,9 @@ Discretized Stream是Spark Streaming的基础抽象，代表持续性额数据�
 
 ![](http://typora-image.test.upcdn.net/images/DStream-SparkEngine.jpg)
 
-##### 2. DStream创建
+#### 2. DStream创建
 
-###### 1. RDD队列
+##### 1. RDD队列
 
 可以通过使用`ssc.queueStream(queueOfRDDs)`来创建DStream，每一个推送到这个队列中的RDD，都会作为一个DStream处理。
 
@@ -105,7 +105,7 @@ object SparkStreaming01_Queue {
 }
 ```
 
-###### 2. 自定义数据源
+##### 2. 自定义数据源
 
 需要继承Receiver，并实现onStart、onStop方法来自定义数据源采集。
 
@@ -166,7 +166,7 @@ object SparkStreaming02_DIY {
 }
 ```
 
-###### 3. Kafka数据源
+##### 3. Kafka数据源
 
 ```scala
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
@@ -210,11 +210,11 @@ object SparkStreaming03_Kafka {
 }
 ```
 
-##### 3. DStream转换
+#### 3. DStream转换
 
 DStream上的操作与RDD的类似，分为Transformatios（转换）和Output Operations（输出）两种，此外转换操作中还有一些比较特殊的原语，如：updateStateByKey()、transform()以及各种window()相关的原语。
 
-###### 1. 无状态转化操作
+##### 1. 无状态转化操作
 
 无状态转化操作就是把简单的RDD转化操作应用到每个批次上，也就是转化DStream中的每一个RDD。部分无状态转化操作如下。注意：针对键值对的DStream转化操作（比如reduceByKey）要添加`import StreamingContext._`才可以在Scala中使用。
 
