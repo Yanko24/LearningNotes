@@ -1,21 +1,21 @@
-#### Hadoop集群搭建之Hive安装
+### Hadoop集群搭建之Hive安装
 
-##### 1. 准备工作
+#### 1. 准备工作
 
 准备好已经安装了Hadoop的集群服务器之后，需要在其中一台中安装MySQL数据库，安装可以参考[CentOS7安装MySQL5.7](https://github.com/yangqi199808/BigData-Home/blob/master/CentOS/1.CentOS7安装MySQL5.7.md)这篇文章。
 
 下载Hive的安装包并上传至其中一台服务器中，[下载地址](https://downloads.apache.org/hive/)
 
-##### 2. Hive本地安装
+#### 2. Hive本地安装
 
-###### 1. 安装目录规划
+##### 2.1 安装目录规划
 
 ```
 统一安装路径：/opt/modules
 统一软件存放路径：/opt/software
 ```
 
-###### 2. 上传压缩包
+##### 2.2 上传压缩包
 
 ```
 1. 将压缩包上传到[/opt/software]目录下，解压到[/opt/modules]目录下
@@ -26,13 +26,13 @@
 3. 使用[source ~/.bash_profile]使其生效
 ```
 
-###### 3. 上传MySQL的JAR包
+##### 2.3 上传MySQL的JAR包
 
 ```
 将mysql的jar包上传至/opt/modules/hive/lib目录下(注意和自己的mysql相匹配，如果使用mysql8，记得上传mysql8的jar包)
 ```
 
-###### 4. Hive配置
+##### 2.4 Hive配置
 
 配置文件目录：【/opt/modules/hive/conf/】
 
@@ -48,7 +48,7 @@
 
 - hive-site.sh
 
-  需要将`hive-default.xml.template`复制一份为`hive-site.xml`，并删除其配置相关内容
+  需要将`hive-default.xml.template`复制一份为`hive-site.xml`，并删除其配置相关内容，添加如下内容
 
   ```xml
   <configuration>
@@ -87,14 +87,14 @@
   ```
   
 
-###### 5. 初始化MySQL元数据库
+##### 2.5 初始化MySQL元数据库
 
 ```shell
 # 使用命令初始化MySQL元数据库
 [hadoop@master ~]$ schematool -dbType mysql -initSchema
 ```
 
-###### 6. 测试本地安装
+##### 2.6 测试本地安装
 
 ``` shell
 # 直接使用hive启动，hive会主动维护一个metastore服务
@@ -103,51 +103,51 @@
 hive> show databases;
 ```
 
-##### 3. Hive远程安装
+#### 3. Hive远程安装
 
 Hive远程安装是指需要手动维护一个metastore服务或者hiveserver2服务，之后可以在任何一个客户端机器上访问该服务，连接Hive。
 
-###### 1. HiveServer2服务的配置
+##### 3.1 HiveServer2服务的配置
 
-- hive-site.xml
+###### 3.1.1 hive-site.xml
 
-  ```xml
-  <configuration>
-      <property>
-          <name>hive.server2.transport.mode</name>
-          <value>binary</value>
-      </property>
-      <property>
-          <name>hive.server2.thrift.port</name>
-          <value>10000</value>
-      </property>
-      <property>
-          <name>hive.server2.webui.host</name>
-          <value>hadoop01</value>
-      </property>
-      <property>
-          <name>hive.server2.webui.port</name>
-          <value>10002</value>
-      </property>
-  </configuration>
-  ```
-  
-- hive服务
+```xml
+<configuration>
+    <property>
+        <name>hive.server2.transport.mode</name>
+        <value>binary</value>
+    </property>
+    <property>
+        <name>hive.server2.thrift.port</name>
+        <value>10000</value>
+    </property>
+    <property>
+        <name>hive.server2.webui.host</name>
+        <value>hadoop01</value>
+    </property>
+    <property>
+        <name>hive.server2.webui.port</name>
+        <value>10002</value>
+    </property>
+</configuration>
+```
 
-  ```shell
-  # 第一种：可以启动hiveserver2服务，如果启动hiveserver2服务，那么客户只能使用beeline工具连接
-  # 监听状态不退出
-  [hadoop@master ~]$ hiveserver2
-  # 后台启动
-  [hadoop@master ~]$ hive --service hiveserver2 &
-  # 后台启动，日志信息送入黑洞
-  [hadoop@master ~]$ hive --service hiveserver2 2>&1 >/dev/null &
-  
-  # 第二种：可以启动metastore服务
-  [hadoop@master ~]$ hive --service metastore 2>&1 >/dev/null &
-  ```
+###### 3.1.2 hive服务
 
-###### 2. hive客户端配置
+```shell
+# 第一种：可以启动hiveserver2服务，如果启动hiveserver2服务，那么客户只能使用beeline工具连接
+# 监听状态不退出
+[hadoop@master ~]$ hiveserver2
+# 后台启动
+[hadoop@master ~]$ hive --service hiveserver2 &
+# 后台启动，日志信息送入黑洞
+[hadoop@master ~]$ hive --service hiveserver2 2>&1 >/dev/null &
+
+# 第二种：可以启动metastore服务
+[hadoop@master ~]$ hive --service metastore 2>&1 >/dev/null &
+```
+
+##### 3.2 hive客户端配置
 
 将下载好的Hive安装包解压到[/opt/modules]目录下，并配置环境变量即可，修改hive-env.sh的相关路径即可。
 

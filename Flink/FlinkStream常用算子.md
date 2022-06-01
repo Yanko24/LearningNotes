@@ -415,7 +415,7 @@ ElasticsearchSink<Student> elasticsearchSink = studentBuilder.build();
 studentDS.addSink(elasticsearchSink);
 ```
 
-##### 4. 自定义sink
+##### 4. 自定义sink（oracle）
 
 - 自定义sink需要实现`RichSinkFunction`接口
 

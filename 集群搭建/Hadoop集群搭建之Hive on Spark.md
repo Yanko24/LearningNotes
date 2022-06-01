@@ -1,4 +1,4 @@
-#### Hadoop集群搭建之Hive on Spark
+### Hadoop集群搭建之Hive on Spark
 
 用到的各个组件的版本
 
@@ -9,14 +9,14 @@
 | spark  |  2.4.6  |
 | scala  | 2.12.10 |
 
-##### 1. 准备工作
+#### 1. 准备工作
 
 ```shell
 # 下载spark的源码
 wget https://downloads.apache.org/spark/spark-2.4.6/spark-2.4.6.tgz
 ```
 
-##### 2. 编译spark源码
+#### 2. 编译spark源码
 
 ```shell
 # 解压源码到目录下
@@ -32,7 +32,7 @@ tar -zvxf spark-2.4.6.tgz && cd spark-2.4.6
 ./dev/make-distribution.sh --name "hadoop3-without-hive" --tgz "-Pyarn,hadoop-provided,hadoop-3.3,parquet-provided"
 ```
 
-##### 3. Spark配置
+#### 3. Spark配置
 
 将编译好的包解压到/opt/modules目录，并建立软链接为spark。
 
@@ -57,7 +57,7 @@ ln -s spark-2.4.6 spark
   export SPARK_DIST_CLASSPATH=$(/opt/modules/hadoop/bin/hadoop classpath)
   ```
 
-##### 4. Hive配置
+#### 4. Hive配置
 
 ```xml
 <configuration>
@@ -165,7 +165,7 @@ cp mysql-connector-jdbc.jar /opt/modules/hive/lib
 /opt/modules/hive/bin/schematool --initSchema -dbType
 ```
 
-##### 5. 整合jar包
+#### 5. 整合jar包
 
 将spark和hive的jar包整合：
 
@@ -188,7 +188,7 @@ hdfs dfs -mkdir /spark-jars
 hdfs dfs -put /opt/modules/spark/jars/*.jar /spark-jars
 ```
 
-##### 6. 启动服务
+#### 6. 启动服务
 
 ```shell
 # 启动hadoop集群
