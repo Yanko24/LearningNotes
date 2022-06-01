@@ -67,19 +67,21 @@
 
 ---
 
-#### 一、大数据集群搭建
+#### 一、Hadoop集群搭建
 
-1.[Hadoop集群搭建之CentOS7系统配置](集群搭建/Hadoop集群搭建之CentOS7系统配置.md)
+1.[Hadoop集群搭建完整攻略](集群搭建/Hadoop集群搭建/Hadoop集群搭建完整攻略.md)
 
-2.[Hadoop集群搭建之全分布式集群搭建](集群搭建/Hadoop集群搭建之全分布式集群搭建.md)
+2.[Hadoop集群搭建之CentOS7系统配置](集群搭建/Hadoop集群搭建/Hadoop集群搭建之CentOS7系统配置.md)
 
-3.[Hadoop集群搭建之Hive安装](集群搭建/Hadoop集群搭建之Hive安装.md)
+3.[Hadoop集群搭建之全分布式集群搭建](集群搭建/Hadoop集群搭建/Hadoop集群搭建之全分布式集群搭建.md)
 
-4.[Hadoop集群搭建之HBase安装](集群搭建/Hadoop集群搭建之HBase安装.md)
+4.[Hadoop集群搭建之Hive安装](集群搭建/Hadoop集群搭建/Hadoop集群搭建之Hive安装.md)
 
-5.[Hadoop集群搭建之Zeepline安装](集群搭建/Hadoop集群搭建之Zeepline安装.md)
+5.[Hadoop集群搭建之HBase安装](集群搭建/Hadoop集群搭建/Hadoop集群搭建之HBase安装.md)
 
-6.[Hadoop-HA集群启动脚本](集群搭建/Hadoop-HA集群启动脚本.md)
+6.[Hadoop集群搭建之Zeepline安装](集群搭建/Hadoop集群搭建/Hadoop集群搭建之Zeepline安装.md)
+
+7.[Hadoop-HA集群启动脚本](集群搭建/Hadoop集群搭建/Hadoop-HA集群启动脚本.md)
 
 #### 二、Hadoop
 
