@@ -1,0 +1,1 @@
+mysql -h cdh1 -P 9040 -uroot
