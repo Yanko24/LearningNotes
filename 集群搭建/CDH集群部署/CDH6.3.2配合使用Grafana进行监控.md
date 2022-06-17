@@ -1,8 +1,12 @@
-### CDH6.3.2配合使用Prometheus进行监控
+### CDH6.3.2配合使用Grafana进行监控
+
+
 
 下面的很多组件都要用到`JMX`进行监控，需要先去下载`jmx_prometheus_javaagent-0.16.1.jar`，版本可以自行选择，下载地址为：`https://mvnrepository.com/artifact/io.prometheus.jmx/jmx_prometheus_javaagent`，下载后放到一个目录即可。
 
-#### 1. 使用Prometheus监控Kafka
+
+
+#### 2. 使用Prometheus监控Kafka
 
 通过JMX获取kafka-metrics指标，并通过Grafana进行展示。
 
@@ -20,7 +24,7 @@ KAFKA_OPTS=-javaagent:/opt/modules/jmx_exporter/jmx_prometheus_javaagent-0.16.1.
 
 因为消息积压等一些信息没法通过broker进行获取，可以通过[kafka-exporter](https://github.com/xxd763795151/kafka-exporter)获取对应的metrics指标，在对应的github仓库中有详细的步骤。
 
-##### 1.1 配置Prometheus
+##### 2.1 配置Prometheus
 
 在`prometheus.yml`文件中增加如下配置：
 
@@ -42,8 +46,8 @@ KAFKA_OPTS=-javaagent:/opt/modules/jmx_exporter/jmx_prometheus_javaagent-0.16.1.
 
 之后重启prometheus，打开`cdh2:9095/metrics`以及`kafka-exporter-host:9097/prometheus`即可看到对应的metrics。
 
-##### 1.2 配置Grafana
+##### 2.2 配置Grafana
 
 Grafana配置模板参考博主的[文章](https://blog.csdn.net/x763795151/article/details/119705372)，博主也提供了对应的下载地址。
 
-#### 2. 使用Prometheus监控HBase
+#### 3. 使用Prometheus监控HBase
