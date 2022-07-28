@@ -1,5 +1,3 @@
-### Flink中Trigger的介绍及使用
-
 Flink中的Trigger用来确认一个窗口是否应该出发结果的计算，每个`windowAssigner`都有一个默认的`Trigger`，先来看看`Trigger`的定义及其API。
 
 #### 1. Trigger的定义
