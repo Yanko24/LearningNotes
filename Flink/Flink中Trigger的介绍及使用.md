@@ -1,6 +1,6 @@
 Flink中的Trigger用来确认一个窗口是否应该出发结果的计算，每个`windowAssigner`都有一个默认的`Trigger`，先来看看`Trigger`的定义及其API。
 
-#### 1. Trigger的定义
+### 1. Trigger的定义
 
 ```java
 @PublicEvolving
@@ -91,7 +91,7 @@ Flink提供了一些内置的`Trigger`实现，这些`Trigger`往往配合`timer
 - `DeltaTrigger`：基于DeltaFunction和阈值Trigger的触发器，此触发器计算最后触发的数据点与当前到达的数据点之间的增量。如果 delta 高于指定的阈值，它就会触发
 - `PurgingTrigger`：将另一个触发器作为参数，并返回一个清除触发器
 
-#### 2. EventTimeTrigger的实现
+### 2. EventTimeTrigger的实现
 
 ```java
 /**
@@ -219,17 +219,17 @@ public enum TriggerResult {
 }
 ```
 
-#### 3. 简单案例
+### 3. 简单案例
 
 需求：实现一天24小时内的uv，并且每隔30分钟计算输出一次或者每隔1000条数据窗口计算输出一次，窗口关闭时触发计算并清除数据
 
-##### 1. 数据格式
+#### 1. 数据格式
 
 ```
 309473,3665543,2640118,pv,1511658009
 ```
 
-##### 2. UserBehavior
+#### 2. UserBehavior
 
 ```java
 /**
@@ -332,7 +332,7 @@ public class UserBehavior {
 }
 ```
 
-##### 3. UserVisitorCount
+#### 3. UserVisitorCount
 
 ```java
 /**
@@ -391,7 +391,7 @@ public class UserVisitorCount {
 }
 ```
 
-##### 4. 自定义ProcessWindowFunction实现计算逻辑
+#### 4. 自定义ProcessWindowFunction实现计算逻辑
 
 ```java
 public class UservistorProcessWindowFunction extends ProcessWindowFunction<UserBehavior, UserVisitorCount, String, TimeWindow> {
@@ -416,7 +416,7 @@ public class UservistorProcessWindowFunction extends ProcessWindowFunction<UserB
 }
 ```
 
-##### 5. 自定义触发器实现需求逻辑
+#### 5. 自定义触发器实现需求逻辑
 
 ```java
 /**
@@ -592,7 +592,7 @@ public class UservistorTrigger<W extends Window> extends Trigger<Object, W> {
 }
 ```
 
-##### 6. 总体实现逻辑
+#### 6. 总体实现逻辑
 
 ```java
 /**
