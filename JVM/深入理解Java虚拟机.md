@@ -226,7 +226,7 @@ Garbage First（简称G1）开创了收集器面向局部收集的设计思路�
 
 G1基于Region的内存布局是实现Mixed GC的关键，G1不再坚持固定大小以及固定数量的分代区域划分，而是把连续的Java堆划分成多大大小相等的独立区域（Region），每一个Region都可以根据需要扮演新生代的Eden空间、Survivor空间或者老年代空间，收集器能够对扮演不同角色的Region采用不同的策略去处理。Region有一部分特殊的Humongous区域，专门用来存储大对象。G1认为只要超过了一个Region容量一半的对象即为大对象，可以通过`-XX:G1HeapRegionSize`设置Region大小，范围是1MB~32MB，且应为2的N次幂。对于那些超过了整个Region容量的超级大对象，将会被存放在N个连续的Humongous Region之中，G1的大多数行为都把Humongous Region作为老年代的一部分来看待。G1收集器的Region分区如下所示：
 
-<img src="images/G1收集器Region分区.png" style="zoom:50%;text-align:center" />
+<img src="images/G1收集器Region分区.png" style="zoom:50%;text-align:center;" />
 
 G1收集器把堆划分为大小相同的Region，每个Region都会扮演一个角色，分别是E、S、H、O。
 
