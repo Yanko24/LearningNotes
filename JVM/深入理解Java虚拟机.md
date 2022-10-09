@@ -63,7 +63,7 @@ public class ReferenceCountingGC {
 
 可达性分析算法是JVM默认使用的寻找垃圾算法，它通过一系列称为“GC Roots“的跟对象作为起始节点集，从这些节点开始根据引用关系向下搜索，搜索所走过的路径称为”引用链”（Reference Chain），如果这个对象到GC Roots间没有任何引用链相连，或者用图论的话来说就是从GC Roots到这个对象不可达时，则证明此对象是不可能被再使用的。
 
-<img src="http://yanko.test.upcdn.net/images/%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95%E5%88%A4%E5%AE%9A%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E5%8F%AF%E5%9B%9E%E6%94%B6.png" style="zoom:50%;" />
+<img src="images/可达性分析算法判定对象是否可回收.png" style="zoom:50%;" />
 
 从上图中可以看出，对象object5、object6、object7之间虽然互有关联，但是它们到GC Roots是不可达的，因此它们会被判定为可回收的对象。
 
@@ -90,7 +90,7 @@ public class ReferenceCountingGC {
 
 即便在可达性分析算法中判定为不可达的对象，也不是“非死不可”的，还需要进行过两次标记一次筛选的过程。
 
-<img src="http://yanko.test.upcdn.net/images/%E4%B8%A4%E6%AC%A1%E6%A0%87%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AD%9B%E9%80%89.png" style="zoom:50%;" />
+<img src="images/两次标记一次筛选.png" style="zoom:50%;" />
 
 如果对象被判定为有必要执行`finalize()`方法，那么该对象会被放置在一个`F-Queue`的队列之中，并在稍后由一条由虚拟机自动建立的、低调度优先级的`Finalizer`线程去执行它们的`finalize()`方法。这里所说的“执行”是指虚拟机会触发这个方法，但不会承诺一定会等待它运行结束。对象要想在`finalize()`方法中拯救自己，只要重新与引用链上的任何一个对象建立关联即可，譬如把自己（this关键字）赋值给某个类变量或者对象的成员变量，那么在第二次标记时它就会被移出”即将回收”的集合。如果此时这个对象还没有逃脱，那基本上它就要真的被回收了。同时需要注意的是，任何一个对象的`finalize()`方法都只会被系统自动调用一次，如果对象面临下一次回收，它的`finalize()`方法将不会被执行。
 
@@ -139,7 +139,7 @@ public class ReferenceCountingGC {
 
 先用一张图，看看这7款经典的垃圾收集器，这7种作用于不同分代的收集器，如果两个收集器之间存在连线，就说明它们可以搭配使用。其中`Serial + CMS`和`ParNew + Serial Old`在JDK9中完全取消了对这些组合的支持。
 
-<img src="http://yanko.test.upcdn.net/images/7%E7%A7%8D%E7%BB%8F%E5%85%B8%E7%9A%84%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png" style="zoom:50%;" />
+<img src="images/7种经典的垃圾收集器.png" style="zoom:50%;" />
 
 ##### 3.5.1 Serial收集器
 
@@ -157,7 +157,7 @@ Serial收集器是一个单线程收集器，在进行垃圾收集时，必须�
 
 ParNew收集器实质上是Serial收集器的多线程并行版本，在JDK7之前的系统中首选的新生代收集器，因为它是除了Serial收集器之外，可以与CMS收集器配合工作的收集器。
 
-![](http://yanko.test.upcdn.net/images/ParNew+Serial-Old%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
+![](images/ParNew+Serial-Old垃圾收集器.png)
 
 - 标记-复制算法
 - ParNew收集器是激活CMS后（使用`-XX:+UseConcMarkSweepGC`选项）的默认新生代收集器，也可以使用`-XX:+/-UseParNewGC`选项来强制指定或者禁用它
@@ -167,7 +167,7 @@ ParNew收集器实质上是Serial收集器的多线程并行版本，在JDK7之�
 
 Parallel Scavenge收集器重点关注的目标是达到一个可控制的吞吐量（Throughput），CMS等收集器关注的尽可能是缩短垃圾收集时用户线程的停顿时间，所以Parallel Scavenge收集器也叫做“吞吐量优先收集器”。
 
-![](http://yanko.test.upcdn.net/images/Parallel-Scavenge+Parallel-Old%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
+![](images/Parallel-Scavenge+Parallel-Old垃圾收集器.png)
 
 - 标记-复制算法
 - 能够并行收集的多线程收集器
@@ -179,7 +179,7 @@ Parallel Scavenge收集器重点关注的目标是达到一个可控制的吞吐
 
 Serial Old是Serial收集器的老年代版本，也是一个单线程收集器。
 
-![](http://yanko.test.upcdn.net/images/Serial+Serial-Old%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
+![](images/Serial+Serial-Old垃圾收集器.png)
 
 - 标记-整理算法
 - 是Serial收集器的老年代版本，也是单线程收集器
@@ -192,7 +192,7 @@ Serial Old是Serial收集器的老年代版本，也是一个单线程收集器�
 
 Parallel Old是Parallel Scavenge收集器的老年代版本，支持多线程并发收集，在JDK6开始提供。Parallel Old收集器出现后，“吞吐量优先”收集器终于有了比较名副其实的搭配组合，在注重吞吐量或者处理器资源较为稀缺的场合，都可以优先考虑Parallel Scavenge和Parallel Old收集器的组合。需要注意的是Parallel Scavenge收集器架构中本身有PS MarkSweep收集器来进行老年代收集，并非直接调用Serial Old收集器，但是两个实现几乎是一样的。
 
-![](http://yanko.test.upcdn.net/images/Parallel-Scavenge+Parallel-Old%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
+![](images/Parallel-Scavenge+Parallel-Old垃圾收集器.png)
 
 - 标记-整理算法
 - Parallel Old是Parallel Scavenge收集器的老年代版本
@@ -203,7 +203,7 @@ Parallel Old是Parallel Scavenge收集器的老年代版本，支持多线程并
 
 CMS（Concurrent Mark Sweep）收集器是一种以获取最短回收停顿时间为目标的收集器，如果希望系统停顿时间尽可能短，以给用户带来最好的交互体检，则CMS收集器是非常合适的。CMS在一些公开文档中也被称之为“并发低停顿收集器“（Concurrent Low Pause Collector）。
 
-![](http://yanko.test.upcdn.net/images/Concurrent-Mark-Sweep%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
+![](images/Concurrent-Mark-Sweep垃圾收集器.png)
 
 - 标记-清除算法
 - CMS收集器运作过程
@@ -226,7 +226,7 @@ Garbage First（简称G1）开创了收集器面向局部收集的设计思路�
 
 G1基于Region的内存布局是实现Mixed GC的关键，G1不再坚持固定大小以及固定数量的分代区域划分，而是把连续的Java堆划分成多大大小相等的独立区域（Region），每一个Region都可以根据需要扮演新生代的Eden空间、Survivor空间或者老年代空间，收集器能够对扮演不同角色的Region采用不同的策略去处理。Region有一部分特殊的Humongous区域，专门用来存储大对象。G1认为只要超过了一个Region容量一半的对象即为大对象，可以通过`-XX:G1HeapRegionSize`设置Region大小，范围是1MB~32MB，且应为2的N次幂。对于那些超过了整个Region容量的超级大对象，将会被存放在N个连续的Humongous Region之中，G1的大多数行为都把Humongous Region作为老年代的一部分来看待。G1收集器的Region分区如下所示：
 
-<img src="http://yanko.test.upcdn.net/images/G1%E6%94%B6%E9%9B%86%E5%99%A8Region%E5%88%86%E5%8C%BA.png" style="zoom:50%;" />
+<img src="images/G1收集器Region分区.png" style="zoom:50%;" />
 
 G1收集器把堆划分为大小相同的Region，每个Region都会扮演一个角色，分别是E、S、H、O。
 
@@ -237,7 +237,7 @@ G1收集器把堆划分为大小相同的Region，每个Region都会扮演一个
 
 G1保留了新生代和老年代的概念，但是新生代和老年代不再是固定的，它们是一系列区域（不需要连续）的动态集合。G1收集器之所以能够建立可预测的停顿时间模型，是因为它将Region作为单次回收最小的单元，即每次收集到的空间都是Region大小的整数倍，这样可以避免在整个Java堆中进行全区域的垃圾收集。实现思路是让G1收集器去跟踪各个Region里面的垃圾堆积的“价值”大小，价值即回收所获得的空间大小以及回收所需时间的经验值，然后在后台维护一个优先级列表，每次根据用户设定允许的停顿收集时间（参数`-XX:MaxGCPauseMillis`指定，默认为200毫秒），优先处理回收那些价值收益最大的Region列表。
 
-![](http://yanko.test.upcdn.net/images/G1%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
+![](images/G1垃圾收集器.png)
 
 - 整理基于“标记-整理”算法，局部（两个Region之间）基于“标记-复制”算法
 - G1收集器运作过程，除了并发标记外，其他阶段也要完全暂停用户线程
