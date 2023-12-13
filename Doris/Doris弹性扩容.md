@@ -30,6 +30,7 @@ alter system add backend "be_host:heartbeat-service_port";
 
 #### 2.2 调整相关Kerberos配置
 
-
+![](https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/doris/error1.png?Expires=1702391105&OSSAccessKeyId=TMP.3KjuVDQvEvc5Hwe9zvR7KWKYcvUufKTq5eCNK5V8ChKFhkbgiY2qEsKceC3cS8KoFndZgjpviZwEieokZZQapw1FhUR3sk&Signature=tW0Hp%2BdI2H6oFzppdmkc%2BiDZ%2FLc%3D)
 
 将doris-1.1.0目录下的`apache_hdfs_broker`安装包分发到新增的Doris节点，同时将
+

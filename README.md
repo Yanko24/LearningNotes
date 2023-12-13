@@ -8,13 +8,13 @@
 
 <table>
     <tr align="center">
-      <th><a href="#一大数据集群搭建"><img width="50px" src="images/大数据集群搭建.png" text-align="center" vertical-align="middle"></th></a>
-      <th><a href="#二Hadoop"><img width="50px" src="images/hadoop.jpg"></th></a>
-      <th><a href="#三Hive"><img width="50px" src="images/hive.jpg"></th></a>
-      <th><a href="#四Spark"><img width="50px" src="images/spark.jpg"></th></a>
-      <th><a href="#五Flink"><img width="50px" src="images/flink.png"></th></a>
-      <th><a href="#六HBase"><img width="50px" src="images/hbase.png"></a></th>
-      <th><a href="#七Kafka"><img width="50px" src="images/kafka.png"></a></th>
+      <th><a href="#一大数据集群搭建"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA.png" text-align="center" vertical-align="middle"></th></a>
+      <th><a href="#二Hadoop"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/hadoop.jpg"></th></a>
+      <th><a href="#三Hive"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/hive.jpg"></th></a>
+      <th><a href="#四Spark"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/spark.jpg"></th></a>
+      <th><a href="#五Flink"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/flink.png"></th></a>
+      <th><a href="#六HBase"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/hbase.png"></a></th>
+      <th><a href="#七Kafka"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/kafka.png"></a></th>
     </tr>
     <tr align="center">
       <td><a href="#一大数据集群搭建">大数据集群搭建</a></td>
@@ -26,13 +26,14 @@
       <td><a href="#七Kafka">Kafka</a></td>
     </tr>
 </table>
+
 <br>
 
 ### 源码阅读
 
 <table>
     <tr align="center">
-        <th><a href="#一Kafka源码"><img width="50px" src="images/kafka.png"></a></th>
+        <th><a href="#一Kafka源码"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/kafka.png"></a></th>
     </tr>
     <tr align="center">
       <td><a href="#一Kafka源码">Kafka</a></td>
@@ -45,12 +46,12 @@
 
 <table>
     <tr align="center">
-      <th><a href="#一Hadoop面试题"><img width="50px" src="images/hadoop.jpg"></th></a>
-      <th><a href="#二Hive面试题"><img width="50px" src="images/hive.jpg"></th></a>
-      <th><a href="#三Spark面试题"><img width="50px" src="images/spark.jpg"></th></a>
-      <th><a href="#四Flink面试题"><img width="50px" src="images/flink.png"></th></a>
-      <th><a href="#五HBase面试题"><img width="50px" src="images/hbase.png"></a></th>
-      <th><a href="#六Kafka面试题"><img width="50px" src="images/kafka.png"></a></th>
+      <th><a href="#一Hadoop面试题"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/hadoop.jpg"></th></a>
+      <th><a href="#二Hive面试题"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/hive.jpg"></th></a>
+      <th><a href="#三Spark面试题"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/spark.jpg"></th></a>
+      <th><a href="#四Flink面试题"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/flink.png"></th></a>
+      <th><a href="#五HBase面试题"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/hbase.png"></a></th>
+      <th><a href="#六Kafka面试题"><img width="50px" src="https://yanko24-note.oss-cn-zhangjiakou.aliyuncs.com/images/kafka.png"></a></th>
     </tr>
     <tr align="center">
       <td><a href="#一Hadoop面试题">Hadoop面试题</a></td>
@@ -61,6 +62,7 @@
       <td><a href="#六Kafka面试题">Kafka面试题</a></td>
     </tr>
 </table>
+
 <br>
 
 ### 第一部分：大数据组件
